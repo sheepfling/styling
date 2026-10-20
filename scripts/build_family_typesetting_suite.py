@@ -735,7 +735,7 @@ def verify_srgb_output_intent(pdf: Path, expected_icc: Path | None = None) -> di
     try:
         from pypdf import PdfReader
     except ImportError as exc:  # pragma: no cover - installation-specific
-        raise BuildError("sRGB verification needs pypdf; install requirements-trinzic-render.txt") from exc
+        raise BuildError("sRGB verification needs pypdf; install the optional PDF-render dependencies") from exc
     try:
         reader = PdfReader(str(pdf), strict=True)
         intents = reader.trailer["/Root"].get("/OutputIntents")

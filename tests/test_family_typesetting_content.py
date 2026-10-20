@@ -81,7 +81,7 @@ class FamilyTypesettingContentTests(unittest.TestCase):
         content = sample_content()
         content.update({
             "title": "A little idea, clearly set",
-            "subtitle": "A gecko absorbs powers.",
+            "subtitle": "A new feature, clearly introduced.",
             "lead": "A friendly page makes the premise easy to enter.",
             "one_page": {"heading": "Brief", "summary": "Summary", "facts": [], "source_note": "Concept only."},
             "ui_components": {
@@ -90,9 +90,9 @@ class FamilyTypesettingContentTests(unittest.TestCase):
                     {"label": "Game detail", "state": "unselected"},
                     {"label": "System", "state": "unselected"},
                 ],
-                "status_chips": [{"label": "C2 / LIGHT"}, {"label": "CONCEPT / OPEN"}],
+                "status_chips": [{"label": "SAMPLE / LIGHT"}, {"label": "CONCEPT / OPEN"}],
                 "panels": [
-                    {"label": "Known", "title": "Premise", "body": "A little gecko absorbs powers.", "tone": "emphasis"},
+                    {"label": "Known", "title": "Current behavior", "body": "The sample begins with one clear action.", "tone": "emphasis"},
                     {"label": "Open", "title": "Still to decide", "body": "The title and rules are not supplied.", "tone": "quiet"},
                 ],
                 "actions": [
@@ -102,7 +102,7 @@ class FamilyTypesettingContentTests(unittest.TestCase):
             },
         })
         style = {
-            "display_name": "Jellybean Games", "status_label": "C2 / LIGHT",
+            "display_name": "Sample Studio", "status_label": "SAMPLE / LIGHT",
             "accents": {"tag_shape": "rounded", "card_shape": "rounded"},
             "one_page_composition": {
                 "flow": ["navigation", "title", "subtitle", "lead", "status_chips", "panels", "actions", "source_note"],

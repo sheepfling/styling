@@ -1,10 +1,12 @@
 # Shared styling foundation
 
-A small, source-aware foundation for independent visual systems. It defines reusable profile and asset-pack contracts, validates asset provenance and output proofs, and demonstrates one bounded SVG-to-PDF build. The shared typography deliverable contract defines a common light-context baseline of one-page and two-page documents, responsive web, product slicks, and component proofs for six neutral profile slots; family-specific type, identity, accents, and compositions stay in their own recipes.
+A small, source-aware foundation for independent visual systems. It defines reusable profile and asset-pack contracts, validates asset provenance and output proofs, and demonstrates one bounded SVG-to-PDF build. The shared typography deliverable contract defines a common light-context baseline of one-page and two-page documents, responsive web, and product slicks for all six separate profiles; family-specific type, identity, and accents stay in their own recipes.
 
 See [the typography output suite](docs/typography-output-suite.md) for the common light-context slots, family-owned type roles, and local build checks.
 
-The registry reserves six neutral profile slots without identity artwork, fonts, or active brand values. Each slot starts source-review-pending until its exact sources, rights, and approved direction are recorded.
+The registry reserves six separate profile slots. Those slots contain no identity artwork, fonts or active brand values; each stays blocked from production use until its exact sources, rights and approved direction are recorded.
+
+See [the source and publication inventory](docs/inventory.md) for the separate direction, proof, production-readiness and publication-clearance states. `source-review-pending` on a slot means source-specific public import is not cleared; it does not change a direction selected in the local source record.
 
 ## Quick start
 

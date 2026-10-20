@@ -1,0 +1,14 @@
+{
+  "profile_id": "starter-sample",
+  "profile_version": "0.1.0",
+  "status": "synthetic-example",
+  "asset_pack_id": "starter-sample-assets",
+  "tokens_path": "examples/starter/tokens.json",
+  "source_record": "examples/starter/source-record.json",
+  "output_capabilities": [
+    {
+      "id": "single-page-pdf",
+      "status": "current_proof"
+    }
+  ]
+}

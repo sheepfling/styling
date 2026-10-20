@@ -1,0 +1,26 @@
+{
+  "interface_id": "brand-asset-pack",
+  "interface_version": "0.1.0",
+  "packs": [
+    {
+      "pack_id": "starter-sample-assets",
+      "brand": "sample",
+      "profile_version": "0.1.0",
+      "availability": "local_assets_present",
+      "source_record": "examples/starter/source-record.json",
+      "source_record_sha256": "b1bbaf3fc40f099f9ec3d4d2d945f60ab83b630338212a8d60c1dbb59aa0a092",
+      "assets": [
+        {
+          "asset_id": "starter-mark",
+          "role": "identity-mark",
+          "availability": "available_local",
+          "path": "examples/starter/assets/mark.svg",
+          "source_path": "examples/starter/assets/mark.svg",
+          "sha256": "e756a7f20ad30ed448fcc7b02054c246a8fbc5eb951fa917aa70a654ce8aa4bc",
+          "provenance": "Authored in this repository as a synthetic tooling fixture.",
+          "rights_note": "Synthetic example only; no third-party or personal identity source."
+        }
+      ]
+    }
+  ]
+}

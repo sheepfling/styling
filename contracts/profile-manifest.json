@@ -1,0 +1,27 @@
+{
+  "interface_id": "profile-manifest",
+  "interface_version": "0.1.0",
+  "schema_version": 1,
+  "required_fields": [
+    "profile_id",
+    "profile_version",
+    "status",
+    "type_roles",
+    "semantic_tokens",
+    "asset_pack_id",
+    "source_record",
+    "output_capabilities"
+  ],
+  "profile_id_pattern": "^system-[0-9]{2}$",
+  "profile_statuses": [
+    "source-review-pending",
+    "candidate",
+    "approved"
+  ],
+  "output_statuses": [
+    "current_proof",
+    "historical_proof",
+    "not_available_current",
+    "not_applicable"
+  ]
+}

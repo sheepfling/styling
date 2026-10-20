@@ -1,0 +1,42 @@
+{
+  "interface_id": "visual-asset-representations",
+  "interface_version": "0.1.0",
+  "schema_version": 1,
+  "representations": [
+    {
+      "id": "starter-mark",
+      "representation": "vector-master",
+      "path": "examples/starter/assets/mark.svg",
+      "sha256": "e756a7f20ad30ed448fcc7b02054c246a8fbc5eb951fa917aa70a654ce8aa4bc",
+      "linked_raster_sources": [],
+      "editable": true
+    },
+    {
+      "id": "starter-proof",
+      "representation": "derived-export",
+      "path": "examples/starter/output/preview.pdf",
+      "sha256": "847c59a36caca258fcc7d2aa87348df704b171a61642c951925b7df5fd0052d4",
+      "source_paths": [
+        "examples/starter/profile.json",
+        "examples/starter/tokens.json",
+        "examples/starter/assets/mark.svg",
+        "examples/starter/output/preview.svg"
+      ],
+      "generator": "scripts/build_preview.py + rsvg-convert",
+      "rendering": "single-page vector PDF with sRGB output intent",
+      "format": "PDF",
+      "page_count": 1,
+      "page_map": [
+        {
+          "page": 1,
+          "source_paths": [
+            "examples/starter/profile.json",
+            "examples/starter/tokens.json",
+            "examples/starter/assets/mark.svg",
+            "examples/starter/output/preview.svg"
+          ]
+        }
+      ]
+    }
+  ]
+}

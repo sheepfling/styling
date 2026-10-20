@@ -1,0 +1,13 @@
+{
+  "interface_id": "profile-manifest",
+  "interface_version": "0.1.0",
+  "schema_version": 1,
+  "profile_id": "system-04",
+  "profile_version": "0.1.0",
+  "status": "source-review-pending",
+  "type_roles": {},
+  "semantic_tokens": {},
+  "asset_pack_id": null,
+  "source_record": null,
+  "output_capabilities": []
+}

@@ -1,0 +1,181 @@
+{
+  "suite_id": "shared-typography-deliverables",
+  "suite_version": "0.4.0",
+  "status": "required-common-output-set",
+  "purpose": "Give every graphic family the same structural deliverable set while keeping its typefaces, palette, identity assets, accents, and capability decisions local to that family.",
+  "content_manifest_schema": "contracts/typography-content-manifest.json",
+  "parity_policy": [
+    "Every family inherits the same five baseline output slots: one-page document, two-page document, responsive light-context web page, product slick, and six-page component proof.",
+    "Every baseline output uses the light context. Light describes the surface and contrast treatment; it is not an extra family or a separate product slot.",
+    "Each family records evidence or an explicit blocked/not-run state for every slot; a missing output is never silently treated as parity.",
+    "The shared hierarchy and composition rules may be reused. Font selections, marks, colors, illustrations, and accent motifs may not be borrowed across families.",
+    "A family may express an accent through its own dividers, markers, frames, panels, or data treatments; each accent needs a semantic or navigational job and must remain distinct from the shared structural rules.",
+    "Output readiness is independent from route selection, publication clearance, browser verification, print approval, and whole-brand approval."
+  ],
+  "family_output_parity": {
+    "required_slots": ["document-one-page", "document-two-page", "web-light", "product-slick", "component-proof"],
+    "all_families_have_same_slots": true,
+    "context": "light",
+    "policy": "The six named families use the same output slot IDs and structural contract. They may use different profile-owned typefaces, accents, assets, page geometry, and content. An absent or held artifact remains a visible coverage gap."
+  },
+  "shared_typography_roles": [
+    "identity.wordmark",
+    "document.kicker",
+    "document.eyebrow",
+    "document.title",
+    "document.subtitle",
+    "document.lead",
+    "section.heading",
+    "section.marker",
+    "body",
+    "body.strong",
+    "label",
+    "data.numeric",
+    "data.axis",
+    "card.title",
+    "caption",
+    "annotation",
+    "footer"
+  ],
+  "typography_role_policy": {
+    "all_families_map_the_same_semantic_roles": true,
+    "mapping_contract": "The exporter requires one role_map entry for every shared_typography_roles item. Each family maps those roles to its own declared physical faces; the font values and visual treatment remain family-owned.",
+    "physical_face_ids": ["body", "display", "strong", "wordmark"],
+    "unresolved_type_policy": "A neutral system face may be used for layout metrics only when the profile records type as unresolved. Such a proof cannot be treated as a typeface selection."
+  },
+  "profile_owned_accent_slots": [
+    {"id": "section-marker", "purpose": "Identify a section or sequence step; pair shape or text with color."},
+    {"id": "divider", "purpose": "Separate related blocks or signal a change in reading mode."},
+    {"id": "informative-panel", "purpose": "Bring a supporting note forward without making every paragraph a card."},
+    {"id": "data-encoding", "purpose": "Distinguish series and states with labels, shapes, or patterns as well as color."},
+    {"id": "identity-accent", "purpose": "Repeat a family-owned mark or motif at a measured scale."},
+    {"id": "wayfinding", "purpose": "Help readers locate a section, continuation, or page state."}
+  ],
+  "long_form_document_components": {
+    "status": "required-for-substantial-specimens",
+    "implementation_rule": "Every adapter supports the semantic structure below while keeping typography, identity, palette, accents, and page geometry in its own family profile. Components may share layout logic; they must use family-owned visual tokens. The same source text should be used when two visual routes are compared.",
+    "components": [
+      {"id": "title-page", "requirements": ["identity", "title", "subtitle", "clear specimen or publication status"]},
+      {"id": "table-of-contents", "requirements": ["linked entries", "page references generated from final pagination", "no hand-maintained page numbers"]},
+      {"id": "heading-hierarchy", "requirements": ["at least three ordered levels", "semantic reading order"]},
+      {"id": "narrative-body", "requirements": ["long-form paragraphs", "comfortable measure and line spacing", "source text shared across visual route comparisons"]},
+      {"id": "figures", "requirements": ["figure number", "caption", "stable anchor", "at least one resolved in-text cross-reference", "asset provenance"]},
+      {"id": "tables", "requirements": ["caption and stable anchor", "wrapping cells", "repeated header when a table spans pages", "resolved in-text cross-reference", "explicitly fictional or source-backed data status"]},
+      {"id": "references", "requirements": ["cited records resolve to a bibliography", "fictional records are labeled fictional", "no fabricated real citations"]},
+      {"id": "appendix", "requirements": ["separate appendix heading and referenceable page entry"]},
+      {"id": "footnotes", "requirements": ["numbered note appears on its source page", "note text remains legible"]},
+      {"id": "running-matter", "requirements": ["distinct header and footer roles", "folio on every content page", "duplex inner/outer convention recorded when applicable"]},
+      {"id": "informative-cards", "variants": ["note", "caution", "specification", "example"], "requirements": ["variant has a textual label and meaning beyond color", "cards do not flatten all body prose into panels"]}
+    ],
+    "verification": ["render every page", "inspect final references and generated contents page", "check font embedding and output color intent", "reject overfull text and unresolved references"]
+  },
+  "baseline_outputs": [
+    {
+      "id": "document-one-page",
+      "format": "PDF",
+      "page_count": 1,
+      "requirements": [
+        "editable source",
+        "clear type hierarchy",
+        "profile-owned accents",
+        "source and output hashes",
+        "screen rendering review"
+      ],
+      "context": "light"
+    },
+    {
+      "id": "document-two-page",
+      "format": "PDF",
+      "page_count": 2,
+      "duplex": "long-edge when intended for print; inner/outer geometry is explicit",
+      "requirements": [
+        "page-one/page-two continuity",
+        "folios",
+        "editable source",
+        "source and output hashes",
+        "screen rendering review"
+      ],
+      "context": "light"
+    },
+    {
+      "id": "web-light",
+      "format": "HTML/CSS",
+      "context": "light",
+      "responsive_widths_px": [
+        320,
+        390,
+        768,
+        1280
+      ],
+      "requirements": [
+        "local declared fonts",
+        "semantic heading order",
+        "keyboard-visible focus when interactive",
+        "reduced-motion handling when motion exists",
+        "browser verification recorded separately"
+      ]
+    },
+    {
+      "id": "product-slick",
+      "format": "PDF",
+      "page_count": "1 or 2, declared by the profile recipe",
+      "requirements": [
+        "product-specific hierarchy",
+        "illustration and data provenance",
+        "no unverified product claims",
+        "editable source",
+        "screen rendering review"
+      ],
+      "context": "light"
+    },
+    {
+      "id": "component-proof",
+      "format": "PDF",
+      "page_count": 6,
+      "context": "light",
+      "requirements": [
+        "shared semantic long-form components",
+        "profile-owned typefaces, palette and accents",
+        "exact sRGB OutputIntent",
+        "editable source and source hashes",
+        "rendered-page review"
+      ]
+    }
+  ],
+  "light_context_policy": "Light is an output context applied consistently across the baseline suite. It is not a typeface or a separate identity. Additional dark or print contexts remain profile-specific and explicit.",
+  "status_legend": {
+    "verified_local_build": "The exact profile recipe, source record, generated output, hashes, and build checks are present.",
+    "static_unverified": "Source or static output exists; browser behavior or target rendering is not verified.",
+    "source_only": "A relevant source specimen exists but does not satisfy the complete baseline output.",
+    "held_route": "The profile is held; do not invent a route or output.",
+    "not_run": "No current output evidence exists.",
+    "reviewed_local_build": "A recipe, local build report, SHA-256-pinned output, and screen rendering review are recorded. This does not imply a separate test-suite ID, browser verification, print approval, release clearance, or whole-family approval."
+  },
+  "profile_slots": [
+    {
+      "id": "system-01",
+      "required_baseline_outputs": "all"
+    },
+    {
+      "id": "system-02",
+      "required_baseline_outputs": "all"
+    },
+    {
+      "id": "system-03",
+      "required_baseline_outputs": "all"
+    },
+    {
+      "id": "system-04",
+      "required_baseline_outputs": "all"
+    },
+    {
+      "id": "system-05",
+      "required_baseline_outputs": "all"
+    },
+    {
+      "id": "system-06",
+      "required_baseline_outputs": "all"
+    }
+  ],
+  "profile_specificity": "Exact typefaces, colors, identity assets, accents, and rights are resolved in each system's own profile and source record. The common contract supplies structure only and does not publish or select brand values."
+}

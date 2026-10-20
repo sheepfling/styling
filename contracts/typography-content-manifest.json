@@ -1,0 +1,27 @@
+{
+  "schema_id": "family-typography-content",
+  "schema_version": "0.1.0",
+  "scope": "Neutral content shape for local family typesetting proofs; brand-specific facts remain in source-backed content files.",
+  "required_blocks": ["title", "subtitle", "lead", "one_page", "sections", "table", "figure", "cards", "references", "appendix", "footnote", "product_slick"],
+  "one_page": {
+    "required_fields": ["summary"],
+    "optional_fields": ["heading", "facts_heading", "facts", "closing_label", "closing", "source_note"],
+    "purpose": "A family-specific short brief, with compact facts and a source note when available."
+  },
+  "product_slick": {
+    "required_fields": ["eyebrow", "title", "subtitle", "description", "highlights", "facts", "next_step", "source_note"],
+    "minimum_highlights": 2,
+    "minimum_facts": 2,
+    "purpose": "A distinct product or offer story; source-backed facts or an explicit fictional/specimen status are required."
+  },
+  "source_records": {
+    "type": "array",
+    "required_item_fields": ["title", "path_or_uri", "sha256", "scope"],
+    "purpose": "Provenance for source content used to write the proof; no invented citations or unsupported commercial claims."
+  },
+  "guardrails": [
+    "Keep family-specific copy, sources, type roles, assets, palette, and accents in that family's input manifest.",
+    "Use explicit specimen language when the proof is fictional, provisional, held, or not a real product offer.",
+    "A filled output slot does not approve a route, claim, launch, or press production."
+  ]
+}

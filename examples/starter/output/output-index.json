@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "proof_pdf_path": "examples/starter/output/preview.pdf",
+  "proof_sha256": "847c59a36caca258fcc7d2aa87348df704b171a61642c951925b7df5fd0052d4",
+  "page_count": 1,
+  "outputs": [
+    {
+      "output_id": "starter-preview",
+      "status": "current_proof",
+      "page": 1,
+      "source_paths": [
+        "examples/starter/profile.json",
+        "examples/starter/tokens.json",
+        "examples/starter/assets/mark.svg",
+        "examples/starter/output/preview.svg"
+      ]
+    }
+  ]
+}

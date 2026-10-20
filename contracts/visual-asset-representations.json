@@ -1,0 +1,23 @@
+{
+  "interface_id": "visual-asset-representations",
+  "interface_version": "0.1.0",
+  "schema_version": 1,
+  "representation_kinds": [
+    "vector-master",
+    "raster-source",
+    "derived-export"
+  ],
+  "invariants": [
+    "Every representation references an included file and its exact SHA-256 digest.",
+    "A vector master may link raster sources; list each dependency and do not describe the whole visual as all-vector.",
+    "A raster source preserves its original bytes, pixel dimensions, color mode, and source provenance.",
+    "A derived export identifies its source files, generator, output format, and page mapping when applicable.",
+    "A derived export may be rasterized and must say so when that is how the output was rendered.",
+    "Do not auto-trace or otherwise replace an approved raster mark without a separately approved vector master."
+  ],
+  "required_fields": {
+    "vector-master": ["id", "path", "sha256", "linked_raster_sources", "editable"],
+    "raster-source": ["id", "path", "sha256", "width", "height", "color_mode", "master_status"],
+    "derived-export": ["id", "path", "sha256", "source_paths", "generator", "rendering", "format", "page_count", "page_map"]
+  }
+}

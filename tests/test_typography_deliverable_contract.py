@@ -16,7 +16,7 @@ class TypographyDeliverableContractTests(unittest.TestCase):
 
     def test_all_families_share_the_same_light_output_slots(self):
         self.assertEqual(self.contract["suite_id"], "shared-typography-deliverables")
-        self.assertEqual(self.contract["suite_version"], "0.4.0")
+        self.assertEqual(self.contract["suite_version"], "0.5.0")
         parity = self.contract["family_output_parity"]
         required = ["document-one-page", "document-two-page", "web-light", "product-slick", "component-proof"]
         self.assertEqual(parity["required_slots"], required)
@@ -28,7 +28,7 @@ class TypographyDeliverableContractTests(unittest.TestCase):
         self.assertEqual(outputs["component-proof"]["page_count"], 6)
         role_policy = self.contract["typography_role_policy"]
         self.assertTrue(role_policy["all_families_map_the_same_semantic_roles"])
-        self.assertEqual(role_policy["physical_face_ids"], ["body", "display", "strong", "wordmark"])
+        self.assertEqual(role_policy["physical_face_ids"], ["body", "display", "strong", "wordmark", "mono"])
         families = {item["id"] for item in self.contract["profile_slots"]}
         self.assertEqual(families, {"system-01", "system-02", "system-03", "system-04", "system-05", "system-06"})
 

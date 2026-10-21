@@ -1,6 +1,6 @@
 {
   "suite_id": "shared-typography-deliverables",
-  "suite_version": "0.4.0",
+  "suite_version": "0.5.0",
   "status": "required-common-output-set",
   "purpose": "Give every graphic family the same structural deliverable set while keeping its typefaces, palette, identity assets, accents, and capability decisions local to that family.",
   "content_manifest_schema": "contracts/typography-content-manifest.json",
@@ -39,8 +39,12 @@
   ],
   "typography_role_policy": {
     "all_families_map_the_same_semantic_roles": true,
-    "mapping_contract": "The exporter requires one role_map entry for every shared_typography_roles item. Each family maps those roles to its own declared physical faces; the font values and visual treatment remain family-owned.",
-    "physical_face_ids": ["body", "display", "strong", "wordmark"],
+    "mapping_contract": "Every PDF and web exporter requires exactly one role_map entry for each shared_typography_roles item. Each semantic role selects its mapped, declared physical face. PDF adapters must use those semantic selectors for every exercised role; validating a map without applying it is insufficient. Font files, sizes, spacing, colors, and visual treatment remain family-owned.",
+    "physical_face_ids": ["body", "display", "strong", "wordmark", "mono"],
+    "required_physical_face_ids": ["body", "display", "strong"],
+    "optional_physical_face_ids": ["wordmark", "mono"],
+    "physical_face_policy": "Suite 0.5 adds optional mono while preserving existing body/display/strong and optional wordmark profiles. A role may map only to a supported physical face explicitly declared by that family. Optional face IDs have no automatic fallback; profiles without them map all 17 semantic roles to their other declared faces.",
+    "pdf_role_selector_policy": "Generate one TeX font selector for all 17 semantic roles from the family's role_map. The selectors bind only to the family's physical font commands; composition adapters own size and spacing. Changing a semantic mapping must change its emitted PDF font selector without editing layout code.",
     "unresolved_type_policy": "A neutral system face may be used for layout metrics only when the profile records type as unresolved. Such a proof cannot be treated as a typeface selection."
   },
   "profile_owned_accent_slots": [

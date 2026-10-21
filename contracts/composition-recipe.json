@@ -1,0 +1,308 @@
+{
+  "schema_id": "family-composition-recipe",
+  "recipe_version": "0.3.0",
+  "supported_recipe_versions": [
+    "0.1.0",
+    "0.2.0",
+    "0.3.0"
+  ],
+  "accent_grammars": {
+    "0.1.0": {
+      "kinds": [
+        "motion-bars",
+        "crosshair",
+        "halftone",
+        "burst",
+        "orbit",
+        "caption-frame"
+      ],
+      "compatibility": "The original six kinds retain their existing bounded parameters and exact native TikZ/SVG serialization. New kinds are rejected under this version."
+    },
+    "0.2.0": {
+      "kinds": [
+        "motion-bars",
+        "crosshair",
+        "halftone",
+        "burst",
+        "orbit",
+        "caption-frame",
+        "trajectory-fan",
+        "registration-tab",
+        "scratch-slashes",
+        "cut-keyline"
+      ],
+      "compatibility": "Adds narrative and comic-finish geometry through a fixed built-in dispatcher; existing six-kind recipes retain their serializers. The outer recipe fields and native macro names are unchanged.",
+      "geometry_only": "Fans and tabs expose label anchors as metadata without rendering family text. Finishes supply bounded vector marks; they do not distress glyphs or select identity assets."
+    },
+    "0.3.0": {
+      "kinds": [
+        "motion-bars",
+        "crosshair",
+        "halftone",
+        "burst",
+        "orbit",
+        "caption-frame",
+        "trajectory-fan",
+        "registration-tab",
+        "scratch-slashes",
+        "cut-keyline",
+        "concentric-rings",
+        "signal-rule"
+      ],
+      "compatibility": "Adds two bounded technical marks through the fixed dispatcher. Prior versions keep their closed kind sets and prior recipes retain native serializer bytes.",
+      "geometry_only": "Concentric circles and straight interrupted rules with transparent hollow nodes contain no copy, font, palette or identity decisions."
+    }
+  },
+  "scope": "Local, trusted family-owned LaTeX compositions and optional hash-pinned static web source using shared semantic type roles, native accents, and output evidence.",
+  "required_fields": [
+    "recipe_version",
+    "family_id",
+    "display_name",
+    "status",
+    "type",
+    "role_map",
+    "palettes",
+    "srgb_icc",
+    "bundle_fonts",
+    "outputs"
+  ],
+  "supported_engines": [
+    "xelatex"
+  ],
+  "trusted_source": "TeX entries and dependencies are trusted local source. The runner disables shell escape; it does not sandbox arbitrary TeX. Recipes do not select or import executable Python plugins.",
+  "source_records": {
+    "required_fields": [
+      "path",
+      "sha256"
+    ],
+    "entry_extension": ".tex",
+    "dependency_extensions": [
+      ".tex",
+      ".sty"
+    ],
+    "resolution": "Paths are relative to the recipe manifest, preserve their declared tree when staged, and must not traverse parents, escape the manifest directory, or pass through symlinks.",
+    "hash_algorithm": "SHA-256"
+  },
+  "fonts": {
+    "required_physical_faces": [
+      "body",
+      "display",
+      "strong"
+    ],
+    "optional_physical_faces": [
+      "wordmark",
+      "mono"
+    ],
+    "required_fields": [
+      "path",
+      "sha256"
+    ],
+    "path_resolution": "Absolute or recipe-relative existing TTF, OTF, or TTC files with TeX-safe resolved paths.",
+    "bundle_fonts": false,
+    "semantic_roles": "All 17 shared semantic roles must bind to explicitly declared physical faces. Font sizes, colors, and composition remain family-owned."
+  },
+  "palette": {
+    "required_fields": [
+      "page",
+      "ink",
+      "muted",
+      "accent",
+      "line"
+    ],
+    "color_format": "#RRGGBB",
+    "generated_names": [
+      "BGPage",
+      "BGInk",
+      "BGMuted",
+      "BGAccent",
+      "BGLine",
+      "Page",
+      "Ink",
+      "Muted",
+      "Accent",
+      "Line"
+    ]
+  },
+  "outputs": {
+    "id_pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+    "required_fields": [
+      "slot",
+      "context",
+      "palette",
+      "page_count",
+      "page",
+      "entry",
+      "dependencies",
+      "bindings",
+      "required_text",
+      "accents"
+    ],
+    "contexts": [
+      "light",
+      "dark",
+      "white",
+      "mixed"
+    ],
+    "page_dimensions_mm": {
+      "minimum": 50,
+      "maximum": 500
+    },
+    "maximum_page_count": 32,
+    "optional_fields": [
+      "assets",
+      "duplex"
+    ],
+    "duplex": {
+      "schema_version": "0.1.0",
+      "required_fields": [
+        "schema_version",
+        "flip",
+        "front_page",
+        "back_page"
+      ],
+      "additional_fields": false,
+      "flip_values": [
+        "long-edge",
+        "short-edge"
+      ],
+      "required_page_count": 2,
+      "front_page": 1,
+      "back_page": 2,
+      "scope": "Optional logical front/back pairing for one sheet. Works with every supported recipe version and any otherwise valid PDF slot, including null. Existing page count, per-page geometry, and zero-rotation checks still apply.",
+      "evidence": "The exact declaration survives in the portable recipe. PDF checks, the per-output build report and rebuild_recipe.duplex record the flip, one sheet and page-to-face map. Outputs without a declaration receive no duplex metadata.",
+      "limits": "No page imposition, page rotation, printer configuration, bleed generation or physical print approval is performed. Flip records the intended printer setting; physical_print_review remains pending."
+    },
+    "assets": {
+      "default": [],
+      "required_record_fields": [
+        "path",
+        "sha256"
+      ],
+      "extensions": [
+        ".png"
+      ],
+      "resolution": "Manifest-contained, non-symlink source paths retain their declared tree in compile staging and the editable rebuild packet. SHA-256 and PNG readability are verified before output creation.",
+      "destinations": "Assets may not duplicate source paths or overlap generated.tex, style.json, content.json, assets/sRGB.icc, or the compiled tree.",
+      "evidence": "Every declared asset is staged and packaged, including unused declarations. Source hashes and origins include it; raster-source representation records preserve exact PNG dimensions, encoded color mode, and no-vector-master status.",
+      "editing_boundary": "Original raster illustrations remain separate from native editable LaTeX typography, TikZ geometry, and generated SVG accents. JPEG is deferred until the representation validator supports it."
+    },
+    "baseline_pdf_slots": {
+      "document-one-page": [
+        1
+      ],
+      "document-two-page": [
+        2
+      ],
+      "product-slick": [
+        1,
+        2
+      ],
+      "component-proof": [
+        6
+      ]
+    },
+    "experimental_slot": null,
+    "coverage": "Only a selected, machine-checked PDF declaring a light context can contribute to its declared PDF baseline slot. Visual review remains pending. Experimental outputs have a null slot. Optional native web source contributes separately to web-light only at a static-checks-passed-awaiting-browser-review status.",
+    "bindings": "PascalCase letter-only keys reference plain string leaves by dotted object keys or list indexes. Each becomes an escaped \\Field<Key> macro.",
+    "required_text": "A non-empty list of content references checked in the extracted PDF text.",
+    "accents": "PascalCase letter-only keys map to kind/width_mm/height_mm/parameters recipes and become \\Accent<Key> macros. The explicit recipe_version selects the closed accent_grammars kind set through accent_registry.py; each fixed native helper enforces its own finite physical bounds. No executable module, family asset, font, or palette fallback is selected by accent data."
+  },
+  "generated_macros": {
+    "fonts": [
+      "BodyFace",
+      "DisplayFace",
+      "StrongFace",
+      "WordmarkFace",
+      "MonoFace"
+    ],
+    "semantic_roles": "TypeIdentityWordmark through TypeFooter, as defined by typography_roles.py",
+    "color_profile": "SrgbIntent; the full document calls this after begin{document}",
+    "data_file": "generated.tex; the full document loads it after fontspec, xcolor, and tikz"
+  },
+  "evidence": [
+    "PDF page counts and dimensions",
+    "required extracted text",
+    "embedded fonts and Unicode maps",
+    "exact sRGB output intent",
+    "TeX layout diagnostics",
+    "per-page previews",
+    "exact source and output hashes",
+    "static dispatcher and selected native helper hashes",
+    "per-accent grammar, serializer, normalized parameters and label anchors",
+    "derived-export representations",
+    "explicit five-slot coverage",
+    "editable ZIP with no font binaries",
+    "optional exact-byte native static web source metadata, semantic binding checks and intended browser viewports"
+  ],
+  "guardrails": [
+    "Existing profile manifests and their renderer remain supported independently.",
+    "A machine-checked screen proof is awaiting visual review until separate evidence records that review.",
+    "A local proof does not establish typography licensing, browser behavior, print production, or identity approval."
+  ],
+  "optional_fields": [
+    "output_dir",
+    "web"
+  ],
+  "web": {
+    "schema_version": "0.1.0",
+    "availability": "Optional, independent of the 0.1.0/0.2.0/0.3.0 accent grammar. Absent declarations retain PDF-only behavior; --no-web omits native web staging and coverage.",
+    "required_fields": [
+      "schema_version",
+      "id",
+      "context",
+      "palette",
+      "entry",
+      "dependencies",
+      "required_text",
+      "viewports"
+    ],
+    "source_records": {
+      "required_fields": [
+        "path",
+        "sha256"
+      ],
+      "entry_extension": ".html",
+      "dependency_extensions": [
+        ".css",
+        ".svg",
+        ".png",
+        ".pdf"
+      ],
+      "resolution": "Exact hash-pinned files must be recipe-relative, non-traversing, non-symlink paths inside the HTML entry directory. They stage relative to that directory under web/ and keep their original tree under recipe-input/.",
+      "maximum_dependencies": 64,
+      "text_file_limit_bytes": 1048576,
+      "binary_file_limit_bytes": 8388608,
+      "total_limit_bytes": 16777216
+    },
+    "source_subset": "UTF-8 balanced HTML with local CSS, passive SVG, PNG geometry and linked PDF signatures. No scripts, inline styles, remote/query/data/parent-traversing references, CSS imports or escapes, active SVG, or font binaries. PNG and linked PDF headers classify exact source; they do not establish successful rendering.",
+    "semantic_checks": [
+      "explicit language, UTF-8 and device viewport",
+      "exactly one title, h1 and main; header, nav and footer",
+      "required content leaves in HTML body text",
+      "local references resolve to declared files and same-document fragments resolve to ids",
+      "image alt attributes",
+      "linked CSS selectors for all 17 roles with font-family: var(--face-PHYSICAL) matching role_map",
+      "family-owned declarations for exercised --face-* font stacks",
+      "focus-visible rule, responsive media rule and reduced-motion media rule"
+    ],
+    "viewports": {
+      "count": [
+        3,
+        8
+      ],
+      "width_css_pixels": [
+        320,
+        2560
+      ],
+      "height_css_pixels": [
+        480,
+        2160
+      ],
+      "rules": "Integer distinct widths including a mobile width at most 480 and desktop width at least 1200. These are intended browser test dimensions, not executed tests."
+    },
+    "typography": "css_role_definitions(role_map, type) emits the same 17 semantic mappings used by TeX. The family owns local font names, fallbacks, sizes, spacing and treatment; computed browser font selection needs browser evidence.",
+    "coverage": "Only an included, statically checked web declaration with context light contributes to web-light, at static-checks-passed-awaiting-browser-review. Other contexts and omitted/absent declarations leave that slot not-run.",
+    "evidence": "Separate web-representations.json records exact native HTML/CSS/SVG/PNG source bytes and linked PDF documents. These are not inserted into the PDF-only derived-export representation grammar. Build reports preserve all origins, hashes, intended viewports and pending browser review.",
+    "review_boundary": "Static signals do not establish responsive computed layout, contrast, keyboard behavior, accessibility or browser font selection. Separate exact-byte browser receipts record those checks; this adapter does not execute family code or publish a site."
+  }
+}

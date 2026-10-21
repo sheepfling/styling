@@ -1,0 +1,6 @@
+# Source-specific local recipes and review outputs stay out of this public foundation.
+/proof-input/
+/output/
+/tmp/
+__pycache__/
+*.pyc

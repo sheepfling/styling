@@ -46,6 +46,26 @@ def sample_content():
 
 
 class FamilyTypesettingContentTests(unittest.TestCase):
+    def test_pdf_preamble_uses_the_declared_semantic_font_bindings(self):
+        faces = {role: {"path": "/tmp/" + role + ".ttf"} for role in ("body", "display", "strong", "mono")}
+        style = {
+            "display_name": "Synthetic family", "type": faces,
+            "colors": {"page": "#FFFFFF", "ink": "#111111", "muted": "#555555", "accent": "#006633"},
+            "accents": {},
+            "role_map": {role: "body" for role in BUILDER.SHARED_TYPE_ROLES},
+        }
+        style["role_map"]["label"] = "mono"
+        style["role_map"]["section.heading"] = "display"
+        with tempfile.TemporaryDirectory() as directory:
+            first = BUILDER.tex_preamble(style, "one-page", Path(directory))
+            style["role_map"]["label"] = "strong"
+            second = BUILDER.tex_preamble(style, "one-page", Path(directory))
+        self.assertIn(r"\newcommand{\TypeLabel}{\MonoFace}", first)
+        self.assertIn(r"\newcommand{\TypeLabel}{\StrongFace}", second)
+        self.assertIn(r"\TypeSectionHeading\color{Accent}\large #2", first)
+        self.assertIn(r"\TypeBody", first)
+        self.assertNotIn(r"\DisplayFace\color{Accent}\large #2", first)
+
     def test_compact_outputs_use_caller_supplied_copy(self):
         content = sample_content()
         style = {

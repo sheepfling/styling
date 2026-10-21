@@ -20,15 +20,13 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+from sheepfling_styling.typography_roles import (
+    SHARED_TYPE_ROLES, PHYSICAL_TYPE_ROLES, tex_role_definitions, validate_role_map,
+)
+
 BAD_TEX = re.compile(r"Overfull \\[hv]box|Missing character|Font Warning|Emergency stop|Citation .* undefined", re.I)
 OUTPUTS = ("one-page", "two-page", "product-slick", "component-proof")
-SHARED_TYPE_ROLES = (
-    "identity.wordmark", "document.kicker", "document.eyebrow", "document.title",
-    "document.subtitle", "document.lead", "section.heading", "section.marker",
-    "body", "body.strong", "label", "data.numeric", "data.axis", "card.title",
-    "caption", "annotation", "footer",
-)
-PHYSICAL_TYPE_ROLES = {"body", "display", "strong", "wordmark"}
 
 
 class BuildError(ValueError):
@@ -137,10 +135,10 @@ def validate_manifest(style: dict[str, Any], content: dict[str, Any]) -> None:
     if not {"body", "display", "strong"}.issubset(style["type"]):
         raise BuildError("Type manifest must define body, display, and strong roles")
     role_map = style.get("role_map")
-    if not isinstance(role_map, dict) or set(role_map) != set(SHARED_TYPE_ROLES):
-        raise BuildError("Type manifest must map every shared semantic type role exactly once")
-    if not set(role_map.values()).issubset(set(style["type"]) & PHYSICAL_TYPE_ROLES):
-        raise BuildError("Semantic type roles must map to declared physical type faces")
+    try:
+        validate_role_map(role_map, style["type"])
+    except ValueError as exc:
+        raise BuildError(str(exc)) from exc
     for source in style["sources"]:
         path = Path(source["path"])
         if not path.is_file():
@@ -169,7 +167,7 @@ def font_command(role: str, face: dict[str, Any], faces: dict[str, Any] | None =
         if faces and "strong" in faces:
             bold = ",BoldFont={" + tex(faces["strong"].get("filename") or Path(faces["strong"].get("build_path") or faces["strong"]["path"]).name) + "}"
         return "\\setmainfont{" + font_name + "}[Path={" + directory + "}" + bold + "]\n\\newcommand{\\BodyFace}{\\rmfamily}\n"
-    command = {"display": "DisplayFace", "strong": "StrongFace", "wordmark": "WordmarkFace"}[role]
+    command = {"display": "DisplayFace", "strong": "StrongFace", "wordmark": "WordmarkFace", "mono": "MonoFace"}[role]
     return "\\newfontfamily\\" + command + "{" + font_name + "}[Path={" + directory + "}]\n"
 
 
@@ -248,22 +246,22 @@ __FONTS__
 \pagecolor{Page}\color{Ink}
 \hypersetup{unicode=true,colorlinks=true,linkcolor=Accent,urlcolor=Accent,pdftitle={__PDFTITLE__},pdfsubject={__SUBJECT__}}
 \setlength\parindent{0pt}\setlength{\parskip}{4pt}\setlength\emergencystretch{1.25em}\hyphenpenalty=3000\exhyphenpenalty=3000\tolerance=2000
-\captionsetup{font=small,labelfont=bf,skip=4pt}
+\DeclareCaptionFont{semantic}{\TypeCaption}\captionsetup{font={semantic,small},labelfont=bf,skip=4pt}
 \newcommand{\AccentMark}{__ACCENTMARK__}
 \newcommand{\AccentArtwork}{__ACCENTARTWORK__}
 \newcommand{\BrandLockup}{\raisebox{-1.5mm}{__IMAGE__}\hspace{3mm}{__WORDMARK__\color{Accent} __BRAND__}}
-\newcommand{\BrandTag}{\tikz[baseline=-.45ex]\node[draw=Line,fill=Tint,line width=.55pt,__TAGSHAPE__,inner xsep=4pt,inner ysep=2pt]{\DisplayFace\small __STATUS__};}
-\newcommand{\SectionHead}[2]{\refstepcounter{section}\addcontentsline{toc}{section}{\protect\numberline{\thesection}#2}\markboth{#2}{}\par\vspace{.8em}\noindent\AccentMark\hspace{.8em}{\DisplayFace\color{Accent}\large #2}\hfill{\StrongFace\color{Muted}\scriptsize #1}\par\vspace{.3em}\color{Line}\rule{\linewidth}{.45pt}\color{Ink}\vspace{.2em}\par}
+\newcommand{\BrandTag}{\tikz[baseline=-.45ex]\node[draw=Line,fill=Tint,line width=.55pt,__TAGSHAPE__,inner xsep=4pt,inner ysep=2pt]{\TypeDocumentEyebrow\small __STATUS__};}
+\newcommand{\SectionHead}[2]{\refstepcounter{section}\addcontentsline{toc}{section}{\protect\numberline{\thesection}#2}\markboth{#2}{}\par\vspace{.8em}\noindent\AccentMark\hspace{.8em}{\TypeSectionHeading\color{Accent}\large #2}\hfill{\TypeSectionMarker\color{Muted}\scriptsize #1}\par\vspace{.3em}\color{Line}\rule{\linewidth}{.45pt}\color{Ink}\vspace{.2em}\par}
 \newtcolorbox{NoteCard}[1][]{colback=Card,colframe=Line,boxrule=.55pt,__CARDSTYLE__,__CARDBORDER__,left=3mm,right=3mm,top=2.3mm,bottom=2.3mm,before skip=2.5mm,after skip=2.5mm,#1}
 \newtcolorbox{TintCard}[1][]{colback=Tint,colframe=Accent,boxrule=.55pt,__CARDSTYLE__,__CARDBORDER__,left=3mm,right=3mm,top=2.3mm,bottom=2.3mm,before skip=2.5mm,after skip=2.5mm,#1}
-\newcommand{\CardHeading}[2]{{\StrongFace\color{Accent}\scriptsize\MakeUppercase{#1}\hfill\DisplayFace\color{Ink}\normalsize #2\par}\vspace{1mm}}
-\newcommand{\RunningMatter}{\pagestyle{fancy}\fancyhf{}\renewcommand\headrulewidth{.35pt}\fancyhead[LE,RO]{\StrongFace\color{Muted}\scriptsize __BRAND__ / \nouppercase{\leftmark}}\fancyhead[LO,RE]{\BrandTag}\fancyfoot[LE,RO]{\DisplayFace\color{Accent}\small\thepage}\fancyfoot[LO,RE]{\StrongFace\color{Muted}\scriptsize LOCAL SPECIMEN / __CONTEXT__}}
+\newcommand{\CardHeading}[2]{{\TypeLabel\color{Accent}\scriptsize\MakeUppercase{#1}\hfill\TypeCardTitle\color{Ink}\normalsize #2\par}\vspace{1mm}}
+\newcommand{\RunningMatter}{\pagestyle{fancy}\fancyhf{}\renewcommand\headrulewidth{.35pt}\fancyhead[LE,RO]{\TypeLabel\color{Muted}\scriptsize __BRAND__ / \nouppercase{\leftmark}}\fancyhead[LO,RE]{\BrandTag}\fancyfoot[LE,RO]{\TypeFooter\color{Accent}\small\thepage}\fancyfoot[LO,RE]{\TypeFooter\color{Muted}\scriptsize LOCAL SPECIMEN / __CONTEXT__}}
 \newcommand{\SrgbIntent}{__SRGB_SPECIALS__}
-\begin{document}\SrgbIntent
+\begin{document}\SrgbIntent\TypeBody
 """
     substitutions = {
         "__SIZE__": sizes[mode], "__PAPER__": paper, "__INNER__": str(inner), "__OUTER__": str(outer), "__TOP__": str(top), "__BOTTOM__": str(bottom),
-        "__FONTS__": "".join(font_command(k, v, fonts) for k, v in fonts.items()),
+        "__FONTS__": "".join(font_command(k, v, fonts) for k, v in fonts.items()) + tex_role_definitions(style["role_map"], fonts),
         "__PAGE__": color("page", c["page"]), "__CARD__": color("card", c.get("card", c["page"])),
         "__INK__": color("ink", c["ink"]), "__MUTED__": color("muted", c["muted"]),
         "__ACCENT__": color("accent", c["accent"]), "__SECONDARY__": color("secondary", c.get("secondary", c["accent"])),
@@ -271,7 +269,7 @@ __FONTS__
         "__PDFTITLE__": tex(style["display_name"] + " typesetting proof"), "__SUBJECT__": tex(style.get("status", "local typesetting study")),
         "__SRGB_SPECIALS__": (r"\special{pdf:fstream @SpecimenSRGB (assets/sRGB.icc) << /N 3 >>}\special{pdf:put @catalog << /OutputIntents [ << /Type /OutputIntent /S /GTS_PDFA1 /OutputConditionIdentifier (sRGB IEC61966-2.1) /RegistryName (http://www.color.org) /Info (sRGB screen proof; not a print certification) /DestOutputProfile @SpecimenSRGB >> ] >>}" if style.get("require_srgb_output_intent") else ""),
         "__ACCENTMARK__": accent_style, "__ACCENTARTWORK__": accent_tex, "__IMAGE__": img_tex,
-        "__WORDMARK__": r"\WordmarkFace" if "wordmark" in fonts else r"\DisplayFace",
+        "__WORDMARK__": r"\TypeIdentityWordmark",
         "__TAGSHAPE__": tag_corners, "__CARDSTYLE__": card_corners, "__CARDBORDER__": card_border,
         "__BRAND__": family_title, "__STATUS__": tex(style.get("status_label", "TYPOGRAPHY STUDY")),
         "__CONTEXT__": tex(style.get("context", "LIGHT")),
@@ -291,7 +289,7 @@ def references_tex(content: dict[str, Any]) -> str:
 
 def table_tex(content: dict[str, Any]) -> str:
     table = content["table"]
-    headers = " & ".join(r"\StrongFace\color{Accent}\small " + tex(x) for x in table["columns"])
+    headers = " & ".join(r"\TypeDataAxis\color{Accent}\small " + tex(x) for x in table["columns"])
     widths = table.get("column_widths", [0.18, 0.3, 0.42])
     if len(widths) != len(table["columns"]) or abs(sum(widths) - 1) > 0.02:
         raise BuildError("Table column widths must match columns and sum to 1")
@@ -301,12 +299,12 @@ def table_tex(content: dict[str, Any]) -> str:
     specs = " ".join(r">{\RaggedRight\arraybackslash}p{\dimexpr" + str(width) + r"\linewidth-" + str(gap_adjust_pt) + r"pt\relax}" for width in widths)
     lines = [r"\begin{longtable}{@{}" + specs + r"@{}}", r"\caption{" + tex(table["caption"]) + r"}\label{tab:shared-components}\\",
              r"\toprule " + headers + r"\\\midrule", r"\endfirsthead",
-             r"\multicolumn{" + str(len(widths)) + r"}{@{}l}{\StrongFace\color{Muted}\small Table continued}\\\toprule " + headers + r"\\\midrule", r"\endhead",
-             r"\midrule\multicolumn{" + str(len(widths)) + r"}{r@{}}{\StrongFace\color{Muted}\scriptsize Continued on next page}\\", r"\endfoot", r"\bottomrule", r"\endlastfoot"]
+             r"\multicolumn{" + str(len(widths)) + r"}{@{}l}{\TypeBodyStrong\color{Muted}\small Table continued}\\\toprule " + headers + r"\\\midrule", r"\endhead",
+             r"\midrule\multicolumn{" + str(len(widths)) + r"}{r@{}}{\TypeBodyStrong\color{Muted}\scriptsize Continued on next page}\\", r"\endfoot", r"\bottomrule", r"\endlastfoot"]
     for row in table["rows"]:
         if len(row) != len(widths):
             raise BuildError("Every table row must match the number of columns")
-        lines.append(" & ".join(r"\BodyFace " + tex(str(cell)) for cell in row) + r"\\[3pt]")
+        lines.append(" & ".join(r"\TypeBody " + tex(str(cell)) for cell in row) + r"\\[3pt]")
     lines.append(r"\end{longtable}")
     return "\n".join(lines)
 
@@ -315,10 +313,10 @@ def figure_tex(content: dict[str, Any]) -> str:
     labels = content["figure"]["steps"]
     if len(labels) != 4:
         raise BuildError("The shared process figure requires four labeled stages")
-    parts = [r"\begin{tikzpicture}[>=stealth, node distance=4mm, every node/.style={font=\BodyFace\small}]" + "\n"]
+    parts = [r"\begin{tikzpicture}[>=stealth, node distance=4mm, every node/.style={font=\TypeBody\small}]" + "\n"]
     for i, label in enumerate(labels):
         x = i * 3.15
-        parts.append(r"\node[draw=Accent,fill=Tint,rounded corners=1mm,minimum width=27mm,minimum height=12mm,align=center] (p" + str(i) + r") at (" + str(x) + r",0) {\StrongFace\color{Accent}" + tex(label) + "};\n")
+        parts.append(r"\node[draw=Accent,fill=Tint,rounded corners=1mm,minimum width=27mm,minimum height=12mm,align=center] (p" + str(i) + r") at (" + str(x) + r",0) {\TypeBodyStrong\color{Accent}" + tex(label) + "};\n")
         if i:
             parts.append(r"\draw[->,color=Accent,line width=.7pt] (p" + str(i-1) + r".east) -- (p" + str(i) + ".west);\n")
     parts.append(r"\end{tikzpicture}")
@@ -339,11 +337,11 @@ def section_tex(item: dict[str, Any], index: int) -> str:
 def cover(style: dict[str, Any], content: dict[str, Any], mode: str) -> str:
     title_size = {"one-page": "22", "two-page": "25", "product-slick": "28", "component-proof": "31"}[mode]
     lead_size = {"one-page": "10", "two-page": "12", "product-slick": "13", "component-proof": "13"}[mode]
-    scope_card = "" if mode == "product-slick" else (r"\vspace{.7em}\begin{TintCard}\CardHeading{SCOPE}{" + tex(style.get("status_label", "SPECIMEN")) + r"}\BodyFace " + tex(style.get("note", "Typesetting review only.")) + r"\end{TintCard}")
+    scope_card = "" if mode == "product-slick" else (r"\vspace{.7em}\begin{TintCard}\CardHeading{SCOPE}{" + tex(style.get("status_label", "SPECIMEN")) + r"}\TypeBody " + tex(style.get("note", "Typesetting review only.")) + r"\end{TintCard}")
     return (r"\thispagestyle{empty}\vspace*{.06\textheight}\noindent\BrandLockup\hfill\BrandTag\par\vspace{1.2em}" +
-            r"\AccentMark\hfill\AccentArtwork\par\vspace{.7em}{\DisplayFace\color{Ink}\fontsize{" + title_size + r"}{" + str(int(title_size) + 5) + r"}\selectfont " + tex(content["title"]) + r"\par}" +
-            r"\vspace{.55em}{\StrongFace\color{Accent}\fontsize{" + lead_size + r"}{" + str(int(lead_size) + 4) + r"}\selectfont " + tex(content["subtitle"]) + r"\par}" +
-            r"\vspace{.6em}{\BodyFace\color{Ink}\large " + tex(content["lead"]) + r"\par}" + scope_card)
+            r"\AccentMark\hfill\AccentArtwork\par\vspace{.7em}{\TypeDocumentTitle\color{Ink}\fontsize{" + title_size + r"}{" + str(int(title_size) + 5) + r"}\selectfont " + tex(content["title"]) + r"\par}" +
+            r"\vspace{.55em}{\TypeDocumentSubtitle\color{Accent}\fontsize{" + lead_size + r"}{" + str(int(lead_size) + 4) + r"}\selectfont " + tex(content["subtitle"]) + r"\par}" +
+            r"\vspace{.6em}{\TypeDocumentLead\color{Ink}\large " + tex(content["lead"]) + r"\par}" + scope_card)
 
 
 def component_proof(style: dict[str, Any], content: dict[str, Any]) -> str:
@@ -361,7 +359,7 @@ def component_proof(style: dict[str, Any], content: dict[str, Any]) -> str:
                            r"\begin{TintCard}\CardHeading{EXAMPLE}{" + tex(content["cards"][3]["title"]) + "}" + tex(content["cards"][3]["body"]) + r"\end{TintCard}"])
     pieces.append(r"\clearpage\section*{References}\addcontentsline{toc}{section}{References}" + references_tex(content))
     pieces.append(r"\clearpage\appendix\section{Component and source ledger}" +
-                  r"\BodyFace " + tex(content["appendix"]["intro"]) + r"\begin{itemize}[leftmargin=1.2em]" +
+                  r"\TypeBody " + tex(content["appendix"]["intro"]) + r"\begin{itemize}[leftmargin=1.2em]" +
                   "".join(r"\item " + tex(v) for v in content["appendix"]["items"]) + r"\end{itemize}" +
                   r"\begin{NoteCard}\CardHeading{PROVENANCE}{Source scope}" + tex(style.get("provenance_note", "The source files and layout assets are listed in the editable package.")) + r"\end{NoteCard}")
     return "\n".join(pieces) + "\n\\end{document}\n"
@@ -372,11 +370,11 @@ def compact_document(style: dict[str, Any], content: dict[str, Any], mode: str) 
     compact_section = lambda item, index: section_tex({**item, "paragraphs": item["paragraphs"][:1]}, index)
     if mode == "two-page":
         pieces.extend([
-            r"\vspace*{.006\textheight}\noindent\BrandTag\hfill{\StrongFace\color{Muted}\scriptsize " + tex(style["display_name"]) + r" / LIGHT SPECIMEN}\par\vspace{.25em}",
+            r"\vspace*{.006\textheight}\noindent\BrandTag\hfill{\TypeBodyStrong\color{Muted}\scriptsize " + tex(style["display_name"]) + r" / LIGHT SPECIMEN}\par\vspace{.25em}",
             r"\AccentMark\par\vspace{.15em}",
-            r"{\DisplayFace\color{Ink}\fontsize{16}{19}\selectfont " + tex(content["title"]) + r"\par}",
-            r"{\StrongFace\color{Accent}\fontsize{9}{11}\selectfont " + tex(content["subtitle"]) + r"\par}",
-            r"{\BodyFace\footnotesize " + tex(content["lead"]) + r"\par}",
+            r"{\TypeDocumentTitle\color{Ink}\fontsize{16}{19}\selectfont " + tex(content["title"]) + r"\par}",
+            r"{\TypeBodyStrong\color{Accent}\fontsize{9}{11}\selectfont " + tex(content["subtitle"]) + r"\par}",
+            r"{\TypeBody\footnotesize " + tex(content["lead"]) + r"\par}",
             r"\RunningMatter\vspace{.25em}",
         ])
         pieces.append(compact_section(content["sections"][0], 1))
@@ -384,7 +382,7 @@ def compact_document(style: dict[str, Any], content: dict[str, Any], mode: str) 
         facts = content["one_page"].get("facts", [])[:3]
         if facts:
             pieces.append(r"\begin{TintCard}\CardHeading{AT A GLANCE}{" + tex(style.get("status_label", "SPECIMEN")) + r"}\begin{itemize}[leftmargin=1.2em,itemsep=.05em]")
-            pieces.extend(r"\item {\StrongFace " + tex(item["label"]) + r"}: " + tex(item["value"]) for item in facts)
+            pieces.extend(r"\item {\TypeBodyStrong " + tex(item["label"]) + r"}: " + tex(item["value"]) for item in facts)
             pieces.append(r"\end{itemize}\end{TintCard}")
         pieces.extend([r"\newpage\RunningMatter", compact_section(content["sections"][1], 2), compact_section(content["sections"][2], 3), table_tex(content),
                        r"\begin{figure}[ht]\centering " + figure_tex(content) + r"\caption{" + tex(content["figure"]["caption"]) + r"}\label{fig:workflow}\end{figure}",
@@ -395,37 +393,37 @@ def compact_document(style: dict[str, Any], content: dict[str, Any], mode: str) 
         one_page = content["one_page"]
         pieces = [r"\thispagestyle{empty}\vspace*{.025\textheight}\noindent\BrandLockup\hfill\BrandTag\par\vspace{.65em}",
                   r"\AccentMark\par\vspace{.3em}",
-                  r"{\DisplayFace\color{Ink}\fontsize{24}{29}\selectfont " + tex(content["title"]) + r"\par}",
-                  r"{\StrongFace\color{Accent}\fontsize{11}{14}\selectfont " + tex(content["subtitle"]) + r"\par}",
-                  r"\vspace{.35em}{\BodyFace\large " + tex(content["lead"]) + r"\par}",
+                  r"{\TypeDocumentTitle\color{Ink}\fontsize{24}{29}\selectfont " + tex(content["title"]) + r"\par}",
+                  r"{\TypeBodyStrong\color{Accent}\fontsize{11}{14}\selectfont " + tex(content["subtitle"]) + r"\par}",
+                  r"\vspace{.35em}{\TypeBody\large " + tex(content["lead"]) + r"\par}",
                   r"\SectionHead{01}{" + tex(one_page.get("heading", content["sections"][0]["title"])) + "}",
-                  r"\BodyFace " + tex(one_page["summary"]) + r"\par\vspace{.25em}"]
+                  r"\TypeBody " + tex(one_page["summary"]) + r"\par\vspace{.25em}"]
         facts = content["one_page"].get("facts", [])
         if facts:
             pieces.append(r"\begin{NoteCard}\CardHeading{" + tex(one_page.get("facts_heading", "AT A GLANCE")) + "}{" + tex(style.get("status_label", "LOCAL SPECIMEN")) + r"}\begin{itemize}[leftmargin=1.2em,itemsep=.1em]")
-            pieces.extend(r"\item {\StrongFace " + tex(item["label"]) + r"}: " + tex(item["value"]) for item in facts)
+            pieces.extend(r"\item {\TypeBodyStrong " + tex(item["label"]) + r"}: " + tex(item["value"]) for item in facts)
             pieces.append(r"\end{itemize}\end{NoteCard}")
         if one_page.get("closing"):
             pieces.append(r"\begin{TintCard}\CardHeading{" + tex(one_page.get("closing_label", "NEXT")) + "}{" + tex(one_page.get("closing_heading", "Before use")) + "}" + tex(one_page["closing"]) + r"\end{TintCard}")
         if one_page.get("source_note"):
-            pieces.append(r"\vfill{\BodyFace\color{Muted}\footnotesize " + tex(one_page["source_note"]) + "}")
+            pieces.append(r"\vfill{\TypeBody\color{Muted}\footnotesize " + tex(one_page["source_note"]) + "}")
     elif mode == "product-slick":
         p = content["product_slick"]
         pieces = [r"\thispagestyle{empty}\vspace*{.02\textheight}\noindent\BrandLockup\hfill\BrandTag\par\vspace{.35em}",
                   r"\AccentMark\hfill\AccentArtwork\par\vspace{.15em}",
-                  r"{\StrongFace\color{Accent}\small\MakeUppercase{" + tex(p["eyebrow"]) + r"}\par}",
-                  r"{\DisplayFace\color{Ink}\fontsize{24}{28}\selectfont " + tex(p["title"]) + r"\par}",
-                  r"{\StrongFace\color{Accent}\normalsize " + tex(p["subtitle"]) + r"\par}",
-                  r"\vspace{.2em}{\BodyFace\small " + tex(p["description"]) + r"\par}",
+                  r"{\TypeBodyStrong\color{Accent}\small\MakeUppercase{" + tex(p["eyebrow"]) + r"}\par}",
+                  r"{\TypeDocumentTitle\color{Ink}\fontsize{24}{28}\selectfont " + tex(p["title"]) + r"\par}",
+                  r"{\TypeBodyStrong\color{Accent}\normalsize " + tex(p["subtitle"]) + r"\par}",
+                  r"\vspace{.2em}{\TypeBody\small " + tex(p["description"]) + r"\par}",
                   r"\SectionHead{01}{" + tex(p.get("highlights_heading", "Highlights")) + "}",
                   r"\begin{itemize}[leftmargin=1.2em,itemsep=.05em,topsep=.1em]"]
         pieces.extend(r"\item[\AccentMark] \textbf{" + tex(item["label"]) + ".} " + tex(item["text"]) for item in p["highlights"])
         pieces.extend([r"\end{itemize}",
                        r"\begin{TintCard}\CardHeading{" + tex(p.get("facts_heading", "STATUS")) + "}{" + tex(style.get("status_label", "LOCAL SPECIMEN")) + r"}\begin{itemize}[leftmargin=1.2em,itemsep=.2em]"])
-        pieces.extend(r"\item {\StrongFace " + tex(item["label"]) + r"}: " + tex(item["value"]) for item in p["facts"])
+        pieces.extend(r"\item {\TypeBodyStrong " + tex(item["label"]) + r"}: " + tex(item["value"]) for item in p["facts"])
         pieces.extend([r"\end{itemize}\end{TintCard}",
-                       r"\vspace{.15em}{\BodyFace\small\StrongFace Next: }{\BodyFace\small " + tex(p["next_step"]) + r"\par}",
-                       r"{\BodyFace\color{Muted}\footnotesize " + tex(p["source_note"]) + "}"])
+                       r"\vspace{.15em}{\TypeBody\small\TypeBodyStrong Next: }{\TypeBody\small " + tex(p["next_step"]) + r"\par}",
+                       r"{\TypeBody\color{Muted}\footnotesize " + tex(p["source_note"]) + "}"])
     return "\n".join(pieces) + "\n\\end{document}\n"
 
 
@@ -433,13 +431,13 @@ def _ui_tab_tex(item: dict[str, Any], style: dict[str, Any]) -> str:
     rounded = "arc=4mm" if style.get("accents", {}).get("tag_shape") == "rounded" else "sharp corners"
     if item["state"] == "selected":
         state = (r"\hspace{.25em}{\tikz[baseline=-.5ex]\draw[color=Page,line width=.7pt] "
-                 r"(0,0)--(1.5pt,-1.5pt)--(4pt,1.8pt);\hspace{.4em}\BodyFace\scriptsize\color{Page}\textbf{SELECTED}}")
+                 r"(0,0)--(1.5pt,-1.5pt)--(4pt,1.8pt);\hspace{.4em}\TypeBody\scriptsize\color{Page}\textbf{SELECTED}}")
         fill, border, ink = "Accent", "Accent", "Page"
     else:
         state = ""
         fill, border, ink = "Card", "Line", "Accent"
     return (r"\tcbox[on line,boxsep=0pt,left=7pt,right=7pt,top=4pt,bottom=4pt," + rounded +
-            r",colback=" + fill + r",colframe=" + border + r",boxrule=.6pt]{\StrongFace\small\color{" + ink + "}" +
+            r",colback=" + fill + r",colframe=" + border + r",boxrule=.6pt]{\TypeBodyStrong\small\color{" + ink + "}" +
             tex(item["label"]) + state + "}")
 
 
@@ -457,7 +455,7 @@ def ui_status_chips_tex(style: dict[str, Any], content: dict[str, Any]) -> str:
     chips = []
     for item in content["ui_components"]["status_chips"]:
         chips.append(r"\tcbox[on line,boxsep=0pt,left=6pt,right=6pt,top=3pt,bottom=3pt," + rounded +
-                     r",colback=Tint,colframe=Line,boxrule=.5pt]{\StrongFace\scriptsize\color{Accent}" +
+                     r",colback=Tint,colframe=Line,boxrule=.5pt]{\TypeBodyStrong\scriptsize\color{Accent}" +
                      tex(item["label"]) + "}")
     gap = float(style.get("one_page_composition", {}).get("chip_gap_mm", 2.2))
     if not 0 <= gap <= 12:
@@ -472,9 +470,9 @@ def ui_panel_tex(item: dict[str, Any], style: dict[str, Any]) -> str:
     rounded = "arc=2.4mm" if style.get("accents", {}).get("card_shape") == "rounded" else "sharp corners"
     return (r"\begin{tcolorbox}[" + rounded + r",colback=" + fill + r",colframe=" + edge +
             r",boxrule=.6pt,left=3mm,right=3mm,top=2.7mm,bottom=2.7mm,boxsep=0pt]" +
-            r"{\StrongFace\color{Accent}\scriptsize\MakeUppercase{" + tex(item["label"]) + r"}}\\[.6mm]" +
-            r"{\DisplayFace\color{Ink}\large " + tex(item["title"]) + r"\par}\vspace{.7mm}" +
-            r"{\BodyFace\color{Ink}\small " + tex(item["body"]) + r"}" + r"\end{tcolorbox}")
+            r"{\TypeBodyStrong\color{Accent}\scriptsize\MakeUppercase{" + tex(item["label"]) + r"}}\\[.6mm]" +
+            r"{\TypeDocumentTitle\color{Ink}\large " + tex(item["title"]) + r"\par}\vspace{.7mm}" +
+            r"{\TypeBody\color{Ink}\small " + tex(item["body"]) + r"}" + r"\end{tcolorbox}")
 
 
 def ui_panels_tex(style: dict[str, Any], content: dict[str, Any]) -> str:
@@ -498,7 +496,7 @@ def ui_actions_tex(style: dict[str, Any], content: dict[str, Any]) -> str:
         elif direction == "forward":
             label += r"\,$\rightarrow$"
         return (r"\tcbox[on line,boxsep=0pt,left=9pt,right=9pt,top=5pt,bottom=5pt," + rounded +
-                r",colback=" + fill + r",colframe=" + edge + r",boxrule=.7pt]{\StrongFace\normalsize\color{" +
+                r",colback=" + fill + r",colframe=" + edge + r",boxrule=.7pt]{\TypeBodyStrong\normalsize\color{" +
                 ink + "}" + label + "}")
     actions = content["ui_components"]["actions"]
     by_kind = {item["kind"]: render(item) for item in actions}
@@ -517,13 +515,13 @@ def composed_one_page(style: dict[str, Any], content: dict[str, Any]) -> str:
         raise BuildError("one_page_composition.title_gap_mm must be between 0 and 12")
     blocks = {
         "navigation": ui_navigation_tex(style, content),
-        "title": r"{\DisplayFace\color{Ink}\fontsize{26}{31}\selectfont " + tex(content["title"]) + r"\par}",
-        "subtitle": r"{\StrongFace\color{Accent}\fontsize{13}{17}\selectfont " + tex(content["subtitle"]) + r"\par}",
-        "lead": r"{\BodyFace\color{Ink}\large " + tex(content["lead"]) + r"\par}",
+        "title": r"{\TypeDocumentTitle\color{Ink}\fontsize{26}{31}\selectfont " + tex(content["title"]) + r"\par}",
+        "subtitle": r"{\TypeBodyStrong\color{Accent}\fontsize{13}{17}\selectfont " + tex(content["subtitle"]) + r"\par}",
+        "lead": r"{\TypeDocumentLead\color{Ink}\large " + tex(content["lead"]) + r"\par}",
         "status_chips": ui_status_chips_tex(style, content),
         "panels": ui_panels_tex(style, content),
         "actions": ui_actions_tex(style, content),
-        "source_note": r"\vfill{\BodyFace\color{Muted}\footnotesize " + tex(one_page.get("source_note", "")) + "}",
+        "source_note": r"\vfill{\TypeBody\color{Muted}\footnotesize " + tex(one_page.get("source_note", "")) + "}",
     }
     pieces = [r"\thispagestyle{empty}\vspace*{.012\textheight}\noindent\BrandLockup\hfill\BrandTag\par"]
     for slot in composition["flow"]:
@@ -607,6 +605,14 @@ def html_document(style: dict[str, Any], content: dict[str, Any], out: Path, wor
     body_weight = style["type"]["body"].get("web_weight", style["type"]["body"].get("weight", 400))
     strong_weight = style["type"].get("strong", style["type"]["body"]).get("web_weight", style["type"].get("strong", style["type"]["body"]).get("weight", 700))
     wordmark_weight = style["type"].get("wordmark", style["type"]["display"]).get("web_weight", style["type"].get("wordmark", style["type"]["display"]).get("weight", 700))
+    mono_css = mono_var = ""
+    if "mono" in style["type"]:
+        mono_face = style["type"]["mono"]
+        mono_family = mono_face.get("family", "monospace")
+        mono_src = css_font_source(mono_face, mono_family)
+        mono_weight = mono_face.get("web_weight", mono_face.get("weight", 400))
+        mono_css = '@font-face {{ font-family: MonoFace; src: {}; font-weight: {}; }}\n'.format(mono_src, mono_weight)
+        mono_var = '--mono:MonoFace, "{}", monospace; '.format(mono_family)
     card_radius = {"rounded": "1.25rem", "offset": "1.25rem", "square": "0"}.get(style["accents"].get("card_shape", "square"), "0")
     tag_radius = {"rounded": "999px", "square": "0"}.get(style["accents"].get("tag_shape", "square"), "0")
     role_face_vars = " ".join("--role-{}:var(--{});".format(role.replace(".", "-"), face) for role, face in style["role_map"].items())
@@ -615,7 +621,7 @@ def html_document(style: dict[str, Any], content: dict[str, Any], out: Path, wor
 @font-face {{ font-family: BodyFace; src: {body_src}; font-weight: {body_weight}; }}
 @font-face {{ font-family: StrongFace; src: {strong_src}; font-weight: {strong_weight}; }}
 @font-face {{ font-family: WordmarkFace; src: {wordmark_src}; font-weight: {wordmark_weight}; }}
-:root {{ --page:#{page}; --card:#{card}; --ink:#{ink}; --muted:#{muted}; --accent:#{accent}; --secondary:#{secondary}; --line:#{line}; --tint:#{tint}; --display:DisplayFace, "{display}", Georgia, serif; --body:BodyFace, "{body}", Georgia, serif; --strong:StrongFace, "{body}", Georgia, serif; --wordmark:WordmarkFace, "{display}", Georgia, serif; {role_face_vars} --card-radius:{card_radius}; --tag-radius:{tag_radius}; }}
+{mono_css}:root {{ --page:#{page}; --card:#{card}; --ink:#{ink}; --muted:#{muted}; --accent:#{accent}; --secondary:#{secondary}; --line:#{line}; --tint:#{tint}; --display:DisplayFace, "{display}", Georgia, serif; --body:BodyFace, "{body}", Georgia, serif; --strong:StrongFace, "{body}", Georgia, serif; --wordmark:WordmarkFace, "{display}", Georgia, serif; {mono_var}{role_face_vars} --card-radius:{card_radius}; --tag-radius:{tag_radius}; }}
 * {{ box-sizing:border-box; }} html {{ background:var(--page); scroll-behavior:smooth; }} body {{ margin:0; color:var(--ink); background:var(--page); font:1rem/1.55 var(--body); }}
 h1,h2,h3,.tag,.eyebrow {{ font-family:var(--display); }} .lockup span {{ font-family:var(--wordmark); font-weight:{wordmark_weight}; }} strong,b {{ font-family:var(--strong); font-weight:{strong_weight}; }} h1 {{ font-size:clamp(2.35rem,6vw,4.4rem); line-height:1.02; margin:.4em 0; }} h2 {{ font-size:clamp(1.5rem,3vw,2.2rem); color:var(--accent); }} a {{ color:var(--accent); }} a:focus-visible {{ outline:3px solid var(--ink); outline-offset:4px; }}
 .skip {{ position:absolute; top:-5rem; left:1rem; background:var(--accent); color:#fff; padding:.7rem 1rem; }} .skip:focus {{ top:1rem; }} header,footer {{ display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem clamp(1.2rem,5vw,4rem); border-bottom:1px solid var(--line); }} .lockup {{ display:flex; align-items:center; gap:.7rem; color:var(--accent); text-decoration:none; font-weight:700; }} .lockup img {{ width:2.2rem; height:auto; }} nav {{ display:flex; gap:1.2rem; flex-wrap:wrap; }} main {{ width:min(100% - 2.4rem,74rem); margin:auto; }} .hero {{ display:grid; grid-template-columns:1.1fr .9fr; gap:3rem; align-items:center; padding:4rem 0; }} .subtitle {{ color:var(--accent); font-size:1.2rem; font-weight:700; }} .lead {{ font-size:1.15rem; }} .scope,.caption,.refs {{ color:var(--muted); }} .tag {{ border:1px solid var(--line); background:var(--tint); color:var(--accent); border-radius:0; padding:.35rem .7rem; font-size:.72rem; letter-spacing:.04em; }} .accent-mark {{ color:var(--secondary); margin-left:1rem; }} .hero-figure {{ padding:2rem; background:var(--card); border:1px solid var(--line); }} .hero-figure ol {{ display:flex; gap:.5rem; list-style:none; padding:0; }} .hero-figure li {{ flex:1; padding:.9rem .5rem; text-align:center; border-top:3px solid var(--accent); background:var(--tint); font-weight:700; }} section {{ margin:3rem 0; }} .table-wrap {{ overflow-x:auto; }} table {{ width:100%; border-collapse:collapse; }} caption {{ text-align:left; color:var(--muted); padding:.6rem 0; }} th,td {{ border-bottom:1px solid var(--line); padding:.7rem .6rem; text-align:left; vertical-align:top; }} th {{ color:var(--accent); background:var(--tint); }} .card {{ margin:1rem 0; padding:1.2rem; background:var(--card); border-left:4px solid var(--accent); }} .card.caution {{ background:var(--tint); border-left-color:var(--secondary); }} .eyebrow {{ color:var(--accent); font-size:.78rem; font-weight:700; letter-spacing:.06em; }} footer {{ margin-top:4rem; border-top:1px solid var(--line); border-bottom:0; color:var(--muted); font-size:.82rem; }}
@@ -624,7 +630,7 @@ h1,h2,h3,.tag,.eyebrow {{ font-family:var(--display); }} .lockup span {{ font-fa
 .product-feature,.one-page-summary {{ margin:2rem 0; padding:1.4rem; border-left:4px solid var(--accent); background:var(--card); }} .product-feature ul,.one-page-summary ul {{ padding-left:1.2rem; }}
 @media print {{ html,body {{ background:#fff; }} .skip,nav {{ display:none; }} .hero {{ padding:1.5rem 0; }} .hero-figure,.card,table {{ break-inside:avoid; }} header,footer {{ padding:.5rem 0; }} }}
 {role_selectors}'''.format(
-        display=display,body=body,display_src=display_src,body_src=body_src,strong_src=strong_src,wordmark_src=wordmark_src,display_weight=display_weight,body_weight=body_weight,strong_weight=strong_weight,wordmark_weight=wordmark_weight,role_face_vars=role_face_vars,role_selectors=role_selectors,card_radius=card_radius,tag_radius=tag_radius,page=color("page",colors["page"]),card=color("card",colors.get("card",colors["page"])),ink=color("ink",colors["ink"]),muted=color("muted",colors["muted"]),accent=color("accent",colors["accent"]),secondary=color("secondary",colors.get("secondary",colors["accent"])),line=color("line",colors.get("line",colors["accent"])),tint=color("tint",colors.get("tint",colors["page"])))
+        display=display,body=body,display_src=display_src,body_src=body_src,strong_src=strong_src,wordmark_src=wordmark_src,display_weight=display_weight,body_weight=body_weight,strong_weight=strong_weight,wordmark_weight=wordmark_weight,mono_css=mono_css,mono_var=mono_var,role_face_vars=role_face_vars,role_selectors=role_selectors,card_radius=card_radius,tag_radius=tag_radius,page=color("page",colors["page"]),card=color("card",colors.get("card",colors["page"])),ink=color("ink",colors["ink"]),muted=color("muted",colors["muted"]),accent=color("accent",colors["accent"]),secondary=color("secondary",colors.get("secondary",colors["accent"])),line=color("line",colors.get("line",colors["accent"])),tint=color("tint",colors.get("tint",colors["page"])))
     (out / "index.html").write_text(html, encoding="utf-8")
     (out / "styles.css").write_text(css, encoding="utf-8")
     for face in style["type"].values():
@@ -780,6 +786,9 @@ def has_srgb_output_intent(pdf: Path, expected_icc: Path | None = None) -> bool:
 def build(style_path: Path, content_path: Path, output_override: Path | None = None,
           only_outputs: tuple[str, ...] | None = None, include_web: bool = True) -> dict[str, Any]:
     style, content = read_json(style_path), read_json(content_path)
+    if "recipe_version" in style:
+        from build_recipe_suite import build as build_recipe
+        return build_recipe(style_path, content_path, output_override, only_outputs, include_web)
     manifest_dir = style_path.parent
     for source in style.get("sources", []):
         path = Path(source["path"])
@@ -987,11 +996,11 @@ def main() -> int:
     parser.add_argument("--style", type=Path, required=True, help="family-owned style manifest")
     parser.add_argument("--content", type=Path, required=True, help="content fixture with source notes")
     parser.add_argument("--output-dir", type=Path, help="override the output directory from the private style manifest")
-    parser.add_argument("--only", action="append", choices=OUTPUTS, help="build selected PDF outputs (repeatable)")
+    parser.add_argument("--only", action="append", help="build selected PDF output IDs (repeatable; validated by the selected recipe)")
     parser.add_argument("--no-web", action="store_true", help="omit web-light output for a bounded PDF review")
     args = parser.parse_args()
     try:
-        report = build(args.style.resolve(), args.content.resolve(), args.output_dir.resolve() if args.output_dir else None,
+        report = build(args.style.resolve(), args.content.resolve(), args.output_dir.absolute() if args.output_dir else None,
                        tuple(args.only) if args.only else None, not args.no_web)
     except (BuildError, OSError, KeyError, ValueError, zipfile.BadZipFile) as exc:
         print("Family typesetting build rejected: {}".format(exc), file=sys.stderr)

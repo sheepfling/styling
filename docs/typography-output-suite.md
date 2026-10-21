@@ -9,10 +9,12 @@ Each of the six profile slots uses the same five light-context outputs:
 - `document-one-page`: one-page PDF brief.
 - `document-two-page`: two-page PDF with continuity and folios.
 - `web-light`: responsive static HTML/CSS page.
-- `product-slick`: one-page PDF product or profile story.
+- `product-slick`: one- or two-page PDF product or profile story.
 - `component-proof`: six-page PDF that exercises shared semantic document components.
 
 The component proof exercises shared semantic structure such as headings, narrative, tables, figures, notes, cautions, specifications, examples, references, appendix, footnotes, and running matter. It is a required shared slot; each family applies its own type, identity and accents.
+
+A two-page product slick can represent the front and back of one sheet. A [composition recipe](composition-recipes.md) records that intent explicitly with the optional per-output `duplex` object: schema version `0.1.0`, `flip: "long-edge"` or `"short-edge"`, `front_page: 1`, and `back_page: 2`. Both pages keep the declared dimensions and upright orientation; the report preserves the sheet and face map. Two-page articles and reader spreads do not acquire duplex intent automatically. The declaration does not impose pages, configure a printer, or establish physical print approval.
 
 The common semantic vocabulary names 17 type roles. Every family input maps each role to its own physical face IDs (`body`, `display`, `strong`, and `wordmark`). An unresolved family may use a neutral face for layout metrics only if its input records that the face is not selected.
 

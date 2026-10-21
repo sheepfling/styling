@@ -22,3 +22,7 @@ The example writes an editable SVG, a vector PDF with an sRGB output intent, and
 See [the boundary and promotion rules](docs/architecture.md) before adding a source profile.
 
 The profile-agnostic family exporter in `scripts/build_family_typesetting_suite.py` applies the same five light-context outputs to an explicit style manifest and content fixture: one-page document, two-page document, responsive web-light page, product slick, and six-page component proof. See [the typography suite notes](docs/typography-output-suite.md) for the role, accent, and verification rules.
+
+For family-owned editorial, comic, and mark compositions, the same command also accepts [composition recipes](docs/composition-recipes.md). Recipes bind content and all 17 semantic type roles to trusted LaTeX sources, generate matching TikZ/SVG accents, and retain explicit coverage of built and missing baseline slots. The original shared layouts remain available.
+
+Recipe `0.3.0` adds bounded concentric rings and interrupted signal rules with transparent hollow nodes. Earlier recipe versions retain their existing kind sets and native output.

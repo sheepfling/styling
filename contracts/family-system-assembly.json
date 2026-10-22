@@ -1,0 +1,16 @@
+{
+  "interface_id": "family-system-assembly",
+  "interface_version": "0.1.0",
+  "purpose": "Audit multiple family-owned native or recipe proof packets as one route-aware system without changing their visual composition.",
+  "required_fields": ["schema_version", "family_id", "routes", "builds"],
+  "build_kinds": ["native-tex", "native-vector", "composition-recipe"],
+  "route_states": ["proposed-unselected", "selected-for-now"],
+  "route_fields": ["id", "state", "signature_features"],
+  "signature_feature_fields": ["id", "description", "outputs"],
+  "build_fields": ["kind", "route", "source_family_id", "report"],
+  "source_family_id": "The exact package family_id in its build report; an assembly may explicitly group several package IDs under one family without guessing identity from names.",
+  "pin": "Each build report is a packet-relative path and lowercase SHA-256. Native and recipe output PDF and preview bytes are rechecked against the report; native staged sources are checked against the original manifest.",
+  "output_key": "route-id/output-id distinguishes variants and different source systems without collapsing product slicks or route studies.",
+  "coverage": "Only selected-for-now, light-context outputs with explicit baseline slots can fill a baseline proof slot. Unselected route outputs remain experimental. Historical web source remains source-only.",
+  "review": "Signature features become per-output review checklists; audit never asserts those features were visually preserved. Actual visual, browser, print, rights, and customer approvals require separate evidence."
+}

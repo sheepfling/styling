@@ -1,0 +1,31 @@
+{
+  "interface_id": "native-family-proof-adapters",
+  "interface_version": "0.1.0",
+  "purpose": "Bring trusted family-owned TeX and SVG compositions into the shared proof, provenance, and coverage system without replacing their typesetting.",
+  "common_manifest_fields": ["schema_version", "family_id", "source_state", "outputs"],
+  "source_states": ["proposed-unselected", "selected-for-now"],
+  "common_output_fields": ["id", "slot", "context", "entry", "page_pt"],
+  "coverage_slots": ["document-one-page", "document-two-page", "web-light", "product-slick", "component-proof"],
+  "visual_representation_versions": ["0.1.0", "0.2.0"],
+  "coverage_rules": [
+    "Only a selected-for-now light output with an explicit baseline slot can be built as a baseline proof; proposed routes use a null experimental slot.",
+    "A successful build is awaiting visual review and never grants customer approval, public-release clearance, browser verification, or print approval.",
+    "Missing slots stay not-run; native sources are never silently replaced by a shared visual template."
+  ],
+  "native_tex": {
+    "manifest_fields": ["schema_version", "family_id", "source_state", "route", "sources", "outputs", "srgb_icc"],
+    "optional_fields": ["web_source"],
+    "web_source_fields": ["entry", "dependencies"],
+    "web_source_state": "An exact-byte historical HTML/CSS/assets packet can be retained as source-only. It does not satisfy static-web validation or browser review.",
+    "output_fields": ["id", "slot", "context", "entry", "page_count", "page_pt", "required_text", "passes"],
+    "build_checks": ["exact source hashes", "XeLaTeX without shell escape", "page count and point dimensions", "extracted text", "embedded fonts", "exact sRGB OutputIntent", "PNG previews", "shared derived-export representations"],
+    "trust_boundary": "Native TeX is trusted family source. No-shell-escape does not make arbitrary TeX safe to execute. The adapter records rather than rewrites its layout and does not infer semantic role binding from a style manifest."
+  },
+  "native_vector": {
+    "manifest_fields": ["schema_version", "family_id", "source_state", "outputs"],
+    "output_fields": ["id", "route", "slot", "context", "page_pt", "entry", "dependencies"],
+    "source_formats": ["SVG", "PNG", "JPEG"],
+    "build_checks": ["exact source hashes and local links", "SVG point dimensions", "passive SVG subset", "sRGB OutputIntent", "PDF page geometry", "PNG previews", "shared vector, raster, and derived-export representations"],
+    "render_copy": "The original SVG and linked raster bytes remain unchanged. A separately hashed render-only SVG embeds exact declared rasters so librsvg can render parent-relative links without losing artwork."
+  }
+}

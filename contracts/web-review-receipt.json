@@ -1,0 +1,22 @@
+{
+  "schema_id": "web-browser-review-receipt",
+  "schema_version": "0.1.0",
+  "purpose": "Record exact-byte browser and visual review of a static web output at its required responsive widths.",
+  "required_fields": ["schema_version", "status", "reviewer", "reviewed_at", "intended_use", "browser", "entry", "sources", "viewports", "family_character", "blocking_findings", "limitations"],
+  "browser_fields": ["name", "version"],
+  "required_widths_px": [320, 390, 768, 1280],
+  "viewport_fields": ["width", "height", "screenshot", "checks"],
+  "check_keys": ["reflow", "images", "computed_fonts", "keyboard_focus", "reduced_motion", "links", "contrast"],
+  "check_values": ["passed", "not-applicable", "failed"],
+  "family_character_fields": ["reference", "features"],
+  "family_feature_fields": ["name", "disposition", "evidence"],
+  "family_feature_dispositions": ["preserved", "adapted", "missing"],
+  "rules": [
+    "The entry and all declared source files are hash-pinned to the receipt directory.",
+    "Each required width has one exact-byte PNG screenshot and all seven check results.",
+    "A passed receipt has no blocking findings and no failed check; reflow, computed fonts and contrast must be passed.",
+    "A pinned family visual reference and at least one signature feature must be reviewed; a passed review cannot leave a feature missing.",
+    "The entry hash must equal the output hash used by the portfolio coverage record.",
+    "This validator checks the evidence record, not whether a browser action was honestly performed."
+  ]
+}

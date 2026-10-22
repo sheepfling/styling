@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1.0",
+  "profile_id": "system-01",
+  "source_owner": "Synthetic fixture maintainer",
+  "route": {"status": "selected", "name": "Synthetic starter study"},
+  "sources": [
+    {
+      "id": "starter-mark",
+      "kind": "artwork",
+      "origin": "Authored in this repository as a synthetic tooling fixture.",
+      "file": {"path": "assets/mark.svg", "sha256": "e756a7f20ad30ed448fcc7b02054c246a8fbc5eb951fa917aa70a654ce8aa4bc"},
+      "rights": {
+        "status": "verified",
+        "basis": "Synthetic example authored for this repository.",
+        "redistribution": "allowed",
+        "evidence": {"path": "source-record.json", "sha256": "b1bbaf3fc40f099f9ec3d4d2d945f60ab83b630338212a8d60c1dbb59aa0a092"}
+      },
+      "publish": false
+    }
+  ],
+  "typefaces": {"status": "unresolved", "bindings": {}},
+  "claims": [],
+  "states": {"local_proof": "not-started", "production": "not-ready", "publication": "not-cleared"},
+  "evidence": {"design_approval": null, "proof_review": null, "production_approval": null, "publication_clearance": null}
+}

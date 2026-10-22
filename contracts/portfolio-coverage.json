@@ -1,0 +1,20 @@
+{
+  "schema_id": "portfolio-coverage-evidence",
+  "schema_version": "0.1.0",
+  "scope": "One private evidence file per generic profile slot; omitted slots remain not-started in the public portfolio report.",
+  "file_name": "<profile-id>.json inside --evidence-dir",
+  "required_fields": ["schema_version", "profile_id", "slots"],
+  "slot_statuses": ["not-started", "built-awaiting-review", "reviewed", "unavailable-with-reason", "approved"],
+  "slot_fields": ["status", "context", "input", "output", "review", "browser", "approval", "print", "reason"],
+  "pin": "A non-null pin contains exactly a path relative to its evidence directory and the file's lowercase SHA-256 digest. Evidence paths are checked for traversal and symlinks.",
+  "rules": [
+    "Only light-context evidence can advance a required baseline slot.",
+    "Built outputs require pinned input and output bytes.",
+    "Reviewed PDF outputs require a valid pinned PDF visual-review receipt; reviewed web outputs require a valid pinned browser-review receipt.",
+    "Approved outputs require a separate pinned approval record.",
+    "An approved output also requires a validated profile-ready customer intake.",
+    "A print receipt is separate optional evidence and never changes screen-proof status.",
+    "Unavailable outputs require a reason and do not satisfy the baseline."
+  ],
+  "report_boundary": "The report verifies exact evidence bytes and the current PDF/web review receipt formats. It does not establish the truth of a human reviewer's judgment, customer approval, print readiness, or legal rights merely from file presence."
+}

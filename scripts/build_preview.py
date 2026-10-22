@@ -13,11 +13,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from PIL import ImageCms
-from pypdf import PdfReader, PdfWriter
-from pypdf.generic import ArrayObject, DecodedStreamObject, DictionaryObject, NameObject, NumberObject, TextStringObject
+from pypdf import PdfReader
 
 from sheepfling_styling.asset_pack_contract import load_asset_pack
+from sheepfling_styling.pdf_output_intent import add_srgb_output_intent
 from sheepfling_styling.visual_representations import (
     validate_output_index, validate_representation_contract, validate_visual_representations,
 )
@@ -31,25 +30,6 @@ def safe_color(value: str) -> str:
     if not isinstance(value, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
         raise ValueError("Example color tokens must be six-digit hex colors")
     return value
-
-def add_srgb_output_intent(pdf_path: Path) -> None:
-    reader = PdfReader(str(pdf_path))
-    writer = PdfWriter()
-    writer.append_pages_from_reader(reader)
-    profile = DecodedStreamObject()
-    profile.set_data(ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes())
-    profile[NameObject("/N")] = NumberObject(3)
-    profile_ref = writer._add_object(profile)
-    output_intent = DictionaryObject({
-        NameObject("/Type"): NameObject("/OutputIntent"),
-        NameObject("/S"): NameObject("/GTS_PDFA1"),
-        NameObject("/OutputConditionIdentifier"): TextStringObject("sRGB IEC61966-2.1"),
-        NameObject("/Info"): TextStringObject("sRGB IEC61966-2.1"),
-        NameObject("/DestOutputProfile"): profile_ref,
-    })
-    writer._root_object.update({NameObject("/OutputIntents"): ArrayObject([writer._add_object(output_intent)])})
-    with pdf_path.open("wb") as stream:
-        writer.write(stream)
 
 def build(root: Path, output_dir: Path) -> dict[str, object]:
     root = root.resolve()

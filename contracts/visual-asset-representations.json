@@ -1,12 +1,13 @@
 {
   "interface_id": "visual-asset-representations",
-  "interface_version": "0.1.0",
+  "interface_version": "0.2.0",
   "schema_version": 1,
   "representation_kinds": [
     "vector-master",
     "raster-source",
     "derived-export"
   ],
+  "raster_file_formats": ["PNG", "JPEG"],
   "invariants": [
     "Every representation references an included file and its exact SHA-256 digest.",
     "A vector master may link raster sources; list each dependency and do not describe the whole visual as all-vector.",

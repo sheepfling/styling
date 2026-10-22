@@ -1,0 +1,20 @@
+{
+  "schema_id": "pdf-visual-review-receipt",
+  "schema_version": "0.1.0",
+  "purpose": "Tie one PDF screen review to exact output bytes, all pages, intended use and size, findings, and reviewer/date evidence.",
+  "required_fields": ["schema_version", "status", "reviewer", "reviewed_at", "intended_use", "artifact", "pages", "family_character", "blocking_findings", "limitations"],
+  "status_values": ["passed", "blocked"],
+  "artifact_pin": "Safe receipt-relative PDF path and exact lowercase SHA-256 digest.",
+  "page_fields": ["number", "size_pt", "preview", "findings"],
+  "family_character_fields": ["reference", "features"],
+  "family_feature_fields": ["name", "disposition", "evidence"],
+  "family_feature_dispositions": ["preserved", "adapted", "missing"],
+  "rules": [
+    "Every PDF page must have exactly one numbered page record and a pinned PNG preview.",
+    "The receipt's page sizes must match the PDF page boxes within 0.5 pt.",
+    "A passed receipt has no blocking findings.",
+    "Changed PDF or preview bytes invalidate the receipt.",
+    "A pinned family visual reference and at least one signature feature must be reviewed; a passed review cannot leave a feature missing.",
+    "This validates review evidence, not the reviewer's subjective judgment or physical print readiness."
+  ]
+}

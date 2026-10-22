@@ -10,7 +10,7 @@ All six profile slots inherit the same five light-context output slots from
 | `document-one-page` | One-page PDF | Fits the approved content and keeps the family’s information hierarchy legible. |
 | `document-two-page` | Two-page PDF | Preserves section flow, continuity and folios across both pages. |
 | `web-light` | Responsive HTML/CSS | Uses semantic landmarks, responsive reflow, visible keyboard focus and reduced-motion rules. |
-| `product-slick` | One-page PDF | Communicates one product or profile story through a distinct, family-owned composition. |
+| `product-slick` | One- or two-page PDF | Communicates one product or profile story through a distinct, family-owned composition. A two-page slick can declare front/back duplex intent. |
 | `component-proof` | Six-page PDF | Exercises the shared semantic components, including figures, tables, notes, references and running matter. |
 
 Parity means each family can deliver the same formats and semantic roles. It

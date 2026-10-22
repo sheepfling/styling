@@ -16,7 +16,7 @@ The component proof exercises shared semantic structure such as headings, narrat
 
 A two-page product slick can represent the front and back of one sheet. A [composition recipe](composition-recipes.md) records that intent explicitly with the optional per-output `duplex` object: schema version `0.1.0`, `flip: "long-edge"` or `"short-edge"`, `front_page: 1`, and `back_page: 2`. Both pages keep the declared dimensions and upright orientation; the report preserves the sheet and face map. Two-page articles and reader spreads do not acquire duplex intent automatically. The declaration does not impose pages, configure a printer, or establish physical print approval.
 
-The common semantic vocabulary names 17 type roles. Every family input maps each role to its own physical face IDs (`body`, `display`, `strong`, and `wordmark`). An unresolved family may use a neutral face for layout metrics only if its input records that the face is not selected.
+The common semantic vocabulary names 17 type roles. Required faces: `body`, `display`, `strong`. Optional faces: `wordmark`, `mono`. Every role maps to a face explicitly declared by that family; an optional face has no automatic fallback. An unresolved family may use a neutral face for layout metrics only if its input records that the face is not selected.
 
 ## Build and review
 

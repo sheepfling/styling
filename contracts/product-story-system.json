@@ -1,0 +1,23 @@
+{
+  "interface_id": "product-story-system",
+  "interface_version": "0.1.0",
+  "purpose": "Bind several native front/back product proofs to distinct identities, replaceable image stages, concept facets, and cross-product narrative links without standardizing their layout.",
+  "required_fields": ["schema_version", "family_system", "products"],
+  "product_fields": ["id", "proof", "identity", "media", "facets", "links"],
+  "identity_fields": ["name", "backronym", "descriptor", "sequence"],
+  "media_fields": ["id", "asset", "status", "status_label", "fit", "caption", "caption_field", "status_field", "stage"],
+  "media_statuses": ["generated-stand-in", "product-screenshot", "product-visualization", "source-illustration"],
+  "stage_fields": ["page", "panel", "inset_mm", "caption_box"],
+  "rectangle_fields": ["x_mm", "y_mm", "width_mm", "height_mm"],
+  "facet_fields": ["id", "label", "evidence_field", "media"],
+  "link_fields": ["to", "relationship"],
+  "proof_checks": [
+    "The family-system manifest and all referenced build proofs are re-audited from exact bytes.",
+    "The selected proof is a two-page composition recipe with explicit front/back duplex intent; physical print review remains pending.",
+    "Identity name, backronym, descriptor and sequence match the pinned native content and appear in extracted PDF text.",
+    "Each declared media stage binds one exact raster source from the build report; captions and source-status labels match native content and extracted PDF text.",
+    "Contain placement preserves image aspect ratio inside an inset panel; declared image panels and captions remain in page bounds and do not overlap each other.",
+    "Concept facets point to authored content and current media IDs; cross-product links resolve within the suite."
+  ],
+  "limits": "Panel geometry is a declared allocation, not a measurement of printed PDF pixels. The audit does not verify the visual subject of an image, factual product claims, generated-media rights, or physical print readiness; separate image and page review is required."
+}

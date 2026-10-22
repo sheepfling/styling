@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import hashlib
+from io import BytesIO
 import json
 import struct
 import sys
 import unittest
+from PIL import Image
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,6 +102,22 @@ class VisualRepresentationTests(unittest.TestCase):
         index["proof_sha256"] = "0" * 64
         with self.assertRaisesRegex(RepresentationError, "digest"):
             validate_output_index(json.dumps(index).encode(), self.files)
+
+    def test_jpeg_requires_version_02_and_keeps_01_png_records_valid(self):
+        self.assertEqual(validate_visual_representations(json.dumps(self.representations).encode(), self.files)["status"], "passed")
+        stream = BytesIO()
+        Image.new("RGB", (3, 2), "#889977").save(stream, format="JPEG")
+        raw = stream.getvalue()
+        self.files["assets/micrograph.jpg"] = raw
+        self.representations["representations"].append({
+            "id": "micrograph", "representation": "raster-source", "path": "assets/micrograph.jpg",
+            "sha256": digest(raw), "width": 3, "height": 2, "color_mode": "RGB",
+            "master_status": "no-vector-master",
+        })
+        with self.assertRaisesRegex(RepresentationError, "require visual representation 0.2.0"):
+            validate_visual_representations(json.dumps(self.representations).encode(), self.files)
+        self.representations["interface_version"] = "0.2.0"
+        self.assertEqual(validate_visual_representations(json.dumps(self.representations).encode(), self.files)["raster_source_count"], 2)
 
 
 if __name__ == "__main__":

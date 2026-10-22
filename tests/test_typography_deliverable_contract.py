@@ -48,6 +48,21 @@ class TypographyDeliverableContractTests(unittest.TestCase):
         self.assertGreaterEqual(schema["product_slick"]["minimum_facts"], 2)
         self.assertIn("source_records", schema)
 
+    def test_public_guides_reflect_contract_page_and_face_rules(self):
+        outputs = {item["id"]: item for item in self.contract["baseline_outputs"]}
+        self.assertEqual(outputs["product-slick"]["page_count"], "1 or 2, declared by the profile recipe")
+        review = (ROOT / "docs/family-composition-review-2026-10-19.md").read_text(encoding="utf-8")
+        self.assertIn("| `product-slick` | One- or two-page PDF |", review)
+        guide = (ROOT / "docs/typography-output-suite.md").read_text(encoding="utf-8")
+        policy = self.contract["typography_role_policy"]
+        required = ", ".join(f"`{face}`" for face in policy["required_physical_face_ids"])
+        optional = ", ".join(f"`{face}`" for face in policy["optional_physical_face_ids"])
+        self.assertIn(f"Required faces: {required}. Optional faces: {optional}.", guide)
+        recipes = json.loads((ROOT / "contracts/composition-recipe.json").read_text(encoding="utf-8"))
+        self.assertEqual(recipes["supported_recipe_versions"], ["0.1.0", "0.2.0", "0.3.0"])
+        composition_guide = (ROOT / "docs/composition-recipes.md").read_text(encoding="utf-8")
+        self.assertIn("Recipes `0.1.0`, `0.2.0` and `0.3.0`", composition_guide)
+
 
 if __name__ == "__main__":
     unittest.main()

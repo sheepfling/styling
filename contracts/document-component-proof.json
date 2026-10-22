@@ -1,0 +1,34 @@
+{
+  "schema_id": "document-component-proof",
+  "schema_version": "0.1.0",
+  "purpose": "Bind a family-owned long-form component plan to exact PDF bytes and page-level evidence without prescribing its visual composition.",
+  "feature_ids": [
+    "title-page",
+    "table-of-contents",
+    "heading-hierarchy",
+    "narrative-body",
+    "figures",
+    "tables",
+    "references",
+    "appendix",
+    "footnotes",
+    "running-matter",
+    "informative-cards",
+    "lists",
+    "highlights-underlines",
+    "equations",
+    "accent-marks",
+    "image-provenance"
+  ],
+  "plan_fields": ["schema_version", "family_id", "output_id", "features"],
+  "feature_fields": ["status", "pages", "anchors", "note"],
+  "optional_feature_fields": ["min_internal_links"],
+  "status_values": ["exercised", "not-run"],
+  "rules": [
+    "Every feature is explicit, including features not exercised by the proof.",
+    "Exercised features name one or more valid PDF pages and visible text anchors; not-run features have neither.",
+    "The table of contents may additionally require a minimum count of internal PDF links.",
+    "The auditor verifies the build report's exact PDF hash, page count, feature anchors and internal links.",
+    "Page-level text and link evidence does not replace visual review, source-rights review, browser review or physical print approval."
+  ]
+}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+from io import BytesIO
 import json
 import posixpath
 import struct
@@ -42,11 +43,16 @@ def _load_object(raw: bytes, label: str) -> dict[str, Any]:
 def validate_representation_contract(contract_bytes: bytes) -> dict[str, Any]:
     """Check the declared metadata contract against the installed validator."""
     contract = _load_object(contract_bytes, "visual representation contract")
-    if contract.get("interface_id") != "visual-asset-representations" or contract.get("interface_version") != "0.1.0":
+    version = contract.get("interface_version")
+    if contract.get("interface_id") != "visual-asset-representations" or version not in {"0.1.0", "0.2.0"}:
         raise RepresentationError("Unsupported visual representation contract")
     declared = contract.get("representation_kinds")
     if not isinstance(declared, list) or set(declared) != REPRESENTATION_KINDS:
         raise RepresentationError("Visual representation kinds differ from the installed contract")
+    if version == "0.2.0" and contract.get("raster_file_formats") != ["PNG", "JPEG"]:
+        raise RepresentationError("Visual representation raster formats differ from the installed contract")
+    if version == "0.1.0" and "raster_file_formats" in contract:
+        raise RepresentationError("Legacy visual representation contract cannot declare JPEG")
     expected_fields = {
         "vector-master": {"id", "path", "sha256", "linked_raster_sources", "editable"},
         "raster-source": {"id", "path", "sha256", "width", "height", "color_mode", "master_status"},
@@ -81,7 +87,8 @@ def validate_visual_representations(
     document = _load_object(metadata_bytes, "visual representation metadata")
     if document.get("schema_version") != 1:
         raise RepresentationError("Unsupported visual representation schema version")
-    if document.get("interface_id") != "visual-asset-representations" or document.get("interface_version") != "0.1.0":
+    version = document.get("interface_version")
+    if document.get("interface_id") != "visual-asset-representations" or version not in {"0.1.0", "0.2.0"}:
         raise RepresentationError("Unsupported visual representation contract")
     representations = document.get("representations")
     if not isinstance(representations, list) or not representations:
@@ -109,12 +116,28 @@ def validate_visual_representations(
         path, raw = _check_file(record, files, label)
 
         if kind == "raster-source":
-            if len(raw) < 26 or raw[:8] != PNG_SIGNATURE or raw[12:16] != b"IHDR":
-                raise RepresentationError("{} is not a readable PNG raster source".format(label))
-            width, height = struct.unpack(">II", raw[16:24])
-            color_mode = PNG_COLOR_MODES.get(raw[25])
+            if path.lower().endswith(".png"):
+                if len(raw) < 26 or raw[:8] != PNG_SIGNATURE or raw[12:16] != b"IHDR":
+                    raise RepresentationError("{} is not a readable PNG raster source".format(label))
+                width, height = struct.unpack(">II", raw[16:24])
+                color_mode = PNG_COLOR_MODES.get(raw[25])
+            elif path.lower().endswith((".jpg", ".jpeg")):
+                if version != "0.2.0":
+                    raise RepresentationError("JPEG raster sources require visual representation 0.2.0")
+                try:
+                    from PIL import Image
+                    with Image.open(BytesIO(raw)) as image:
+                        if image.format != "JPEG":
+                            raise RepresentationError("{} is not a JPEG raster source".format(label))
+                        width, height = image.size
+                        color_mode = image.mode
+                        image.verify()
+                except (ImportError, OSError, ValueError) as exc:
+                    raise RepresentationError("{} needs a readable JPEG and Pillow".format(label)) from exc
+            else:
+                raise RepresentationError("{} raster source must be PNG or JPEG".format(label))
             if (record.get("width"), record.get("height"), record.get("color_mode")) != (width, height, color_mode):
-                raise RepresentationError("{} PNG dimensions or color mode differ from the metadata".format(label))
+                raise RepresentationError("{} raster dimensions or color mode differ from the metadata".format(label))
             if record.get("master_status") not in ("no-vector-master", "vector-master-available"):
                 raise RepresentationError("{} must state whether a vector master exists".format(label))
             raster_paths[record_id] = path
